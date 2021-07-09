@@ -9,7 +9,7 @@ import passportStrat from './middleware/passport';
 import logging from './config/logging';
 // routes imports
 import * as userRoutes from './routes/user';
-
+import * as userYoutube from './routes/youtube';
 const NAMESPACE = 'Server';
 /*
  * Express decleration/ socket.io decleration
@@ -81,7 +81,7 @@ app.use(cors({ credentials: true, origin: ['http://localhost:8080', 'http://loca
  *  Routes go here
  *  */
 app.use('/api/user', userRoutes.router);
-
+app.use('/api/youtube', userYoutube.router);
 /**
  * Error handling
  *  */

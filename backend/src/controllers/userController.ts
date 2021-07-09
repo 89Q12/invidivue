@@ -4,7 +4,7 @@ import { hash, compare } from 'bcrypt';
 import User from '../models/user';
 import RefreshToken from '../models/refreshToken';
 import IEUser from '../interfaces/IEUser';
-import signJWT from '../functions/signJTW';
+import signJWT from '../utils/signJTW';
 
 // Register Funktion
 const register = async (req: Request, res: Response): Promise<Response> => {
