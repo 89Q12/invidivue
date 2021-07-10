@@ -1,21 +1,40 @@
 <template>
   <div id="app">
-    <form>
-      <input v-model="name" placeholder="Enter Name">
-      <button type="submit" @click="handleSubmit">Save name</button>    </form>
-      
+    <form v-on:submit.prevent="noop">
+      <input name="query" v-model="name" v-on:keydown="validateInput" placeholder="">
+      <button type="submit" @click="handleSubmit">Search</button>    
+      </form>
+      <p>{{ log }}</p>
   </div>
+    
 </template>
 
 <script>
 export default {
   data() {
     return {
-      name: ""    };
+      name: ""    ,
+      log:""
+      };  
+  },
+  watch: {
+    // call again the method if the route changes
+    '$route': 'search'
   },
   methods: {
-    handleSubmit(e) {
-      e.preventDefault();
+
+    validateInput: function(e) {
+      if (e.keyCode === 13) {
+        this.handleSubmit();
+      }     
+    },
+    
+    handleSubmit: function() {
+      
+        this.log =this.name  ;
+    },
+    noop () {
+      // do nothing ?
     }
   }
 };

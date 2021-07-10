@@ -3,3 +3,21 @@
 const getVideoById = async (req, res): Promise<any> => {};
 
 export default { getVideoById };
+
+const getSearch = async (req, res): Promise<any> => {
+
+    const { Client } = require("youtubei");
+
+    const youtube = new Client();
+
+    const run = async () => {
+	const videos = await youtube.search("Never gonna give you up", {
+		type: "all", // video | playlist | channel | all
+	});
+	console.log(videos.length);
+    console.log(videos);
+    };
+    run();
+};
+
+export default { getSearch };

@@ -5,4 +5,5 @@ import * as passport from 'passport';
 const router = Router();
 // routes for get_video, get_channel etc go here
 router.get('watch/:vidID', controller.getVideoById)
+router.get('search/:q', controller.getSearch)
 export { router };
