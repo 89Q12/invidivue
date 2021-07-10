@@ -2,10 +2,8 @@
 	<header>
 		<nav>
 			<router-link to="/" class="menu-item-invidivue">Invidivue</router-link>
-			<div class="menu-item-search">
-				<o-field>
-					<o-autocomplete placeholder="No label"></o-autocomplete>
-				</o-field>
+			<div class="menu-item-search search">
+				<input placeholder="Search something" />
 			</div>
 			<div>
 				<router-link to="/" class="menu-item-top" @click="store.dispatch('logout')">Logout</router-link>
@@ -20,6 +18,7 @@
 header {
 	top: 0;
 	width: 100%;
+	height: 10vh;
 	z-index: 999;
 
 	.o-switch__label {
@@ -35,13 +34,27 @@ a {
 	color: #ffffff;
 	text-decoration: none;
 }
-
+input {
+	color: #ffffff;
+	background-color: #232323;
+	padding-bottom: 10px;
+	font-size: 100%;
+	border: none;
+	border-bottom: 1px solid;
+	width: 90%;
+}
+input:focus{
+	outline: none;
+}
+div .search {
+	width: 20%;
+}
 nav {
+	height: 100%;
 	display: flex;
 	align-items: center;
-	justify-content: center;
-	margin-left: 10rem;
-	margin-right: 10rem;
+	margin-left: 5vw;
+	margin-right: 5vw;
 }
 
 nav .menu-item {
