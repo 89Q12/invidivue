@@ -20,6 +20,8 @@ backend/**/*.js
 # Package files
 *.jar
 
+# Env files
+*.env
 
 # Maven
 target/
@@ -49,4 +51,3 @@ Thumbs.db
 *.flv
 *.mov
 *.wmv
-cocktailapp/server/src/functions/signJTW.js
