@@ -43,6 +43,9 @@ input {
 	border-bottom: 1px solid;
 	width: 90%;
 }
+input:focus{
+	outline: none;
+}
 div .search {
 	width: 20%;
 }
