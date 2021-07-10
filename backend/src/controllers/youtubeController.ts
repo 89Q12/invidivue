@@ -1,5 +1,6 @@
 // Controller for youtuber routes like getVideoById, getChannelById
 const { Client } = require("youtubei");
+const ytch = require('yt-channel-info');
 const ytdl = require('ytdl-core');
 const youtube = new Client();
 //https://www.youtube.com/watch?v=dQw4w9WgXcQ //Just youtube url 
@@ -29,11 +30,12 @@ const getResults = async (req, res): Promise<any> => {
         const videos = await youtube.search(query, {
             type: "all", // video | playlist | channel | all
         });
+        
         return res.status(200).json({
             message: 'OK',
             ytvideos:videos,
         });
-        
+
         
         
     }
@@ -43,13 +45,19 @@ const getResults = async (req, res): Promise<any> => {
     });
 };
 const getChannel = async (req, res): Promise<any> => {
-    console.log(req.params.vidId);
-    if(req.params.vidId){
-        const chanid= encodeURIComponent(req.params["id"])
-        const channel = await youtube.findOne(chanid, {type: "channel"});
+    if(req.params["cId"]){
+        const chanid= encodeURIComponent(req.params["cId"])
+        const channel = await ytch.getChannelInfo(chanid);
+        
+        const channelId = channel.authorId;
+        console.log(channelId);
+        const sortBy = 'newest';
+
+        const videos = await ytch.getChannelVideos(channelId, sortBy);
         return res.status(200).json({
             message: 'OK',
             channel:channel,
+            videos:videos,
         });
     }
     return res.status(400).json({
