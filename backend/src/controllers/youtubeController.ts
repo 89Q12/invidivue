@@ -2,7 +2,6 @@
 
 const getVideoById = async (req, res): Promise<any> => {};
 
-export default { getVideoById };
 
 const getSearch = async (req, res): Promise<any> => {
 
@@ -20,4 +19,5 @@ const getSearch = async (req, res): Promise<any> => {
     run();
 };
 
-export default { getSearch };
+//export default { getSearch };
+export default { getVideoById,getSearch };
