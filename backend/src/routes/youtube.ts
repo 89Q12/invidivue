@@ -8,4 +8,6 @@ router.get('/watch', controller.getVideoById)
 router.get('/w', controller.getVideoById)
 router.get('/results', controller.getResults)
 router.get('/r', controller.getResults)
+router.get('/channel/:vidId', controller.getChannel)
+router.get('/c/:vidId', controller.getChannel)
 export { router };
