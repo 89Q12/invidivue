@@ -1,7 +1,7 @@
 <template>
 	<header>
 		<nav>
-			<router-link to="/" class="menu-item-invidivue">Invidivue</router-link>
+			<router-link to="/" class="menu-item-invidivue">INVIDIVUE</router-link>
 			<div class="menu-item-search search">
 				<input placeholder="Search something" />
 			</div>
@@ -35,15 +35,19 @@ a {
 	text-decoration: none;
 }
 input {
-	color: #ffffff;
 	background-color: #232323;
 	padding-bottom: 10px;
+
+	color: #ffffff;
 	font-size: 100%;
+	text-align: center;
+
 	border: none;
 	border-bottom: 1px solid;
+
 	width: 90%;
 }
-input:focus{
+input:focus {
 	outline: none;
 }
 div .search {
@@ -101,12 +105,8 @@ nav .menu-item-search {
 }
 nav .menu-item-invidivue {
 	color: blue($color: #000000);
-	padding: 10px 30px;
-	position: relative;
-	text-align: center;
-	border-bottom: 3px solid transparent;
-	display: flex;
-	transition: 400ms;
+	font-size: 100%;
+	font-weight: bold;
 }
 
 nav .menu-item-logout {
