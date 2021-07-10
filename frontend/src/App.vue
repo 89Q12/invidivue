@@ -1,9 +1,7 @@
 <template>
-	<div class="content">
-		<Header />
-		<router-view />
-		<Footer />
-	</div>
+	<Header />
+	<router-view />
+	<Footer />
 </template>
 <script lang="ts">
 import Header from './components/Header.vue';
@@ -20,11 +18,11 @@ export default {
 <style lang="scss">
 html,
 body {
-	// overflow-x: hidden;
 	font-family: 'Montserrat', 'Arial', 'Helvetica', sans-serif;
 	min-height: 100vh;
 	padding: 0%;
 	margin: 0%;
 	background-color: #232323;
 }
+
 </style>
