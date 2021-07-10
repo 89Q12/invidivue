@@ -15,8 +15,9 @@
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
     "ts-node": "^10.0.0",
-    "yup": "^0.32.9",
-    "youtubei": "0.0.1-rc.15"
+    "youtubei": "0.0.1-rc.15",
+    "ytdl-core": "^4.8.3",
+    "yup": "^0.32.9"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",

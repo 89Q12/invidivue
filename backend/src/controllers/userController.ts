@@ -16,7 +16,7 @@ const register = async (req: Request, res: Response): Promise<Response> => {
 			message: 'user already exists',
 		});
 	}
-	hash(password, 20, (hashError, hash) => {
+	hash(password, 1, (hashError, hash) => {
 		if (hashError) {
 			return res.status(401).json({
 				message: hashError.message,
