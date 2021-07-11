@@ -9,7 +9,7 @@
 				<router-link to="/" class="menu-item-top" @click="store.dispatch('logout')">Logout</router-link>
 			</div>
 			<div>
-				<router-link to="/login" class="menu-item-top">Login</router-link>
+				<router-link to="/signin" class="menu-item-top">Login</router-link>
 			</div>
 		</nav>
 	</header>
