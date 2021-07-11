@@ -132,4 +132,30 @@ nav .menu-item-top a {
 	color: inherit;
 	text-decoration: none;
 }
+@media screen and (max-width: 600px) {
+	nav {
+		height: 100%;
+		width: 100%;
+		display: flex;
+	}
+	nav .menu-item-top {
+		color: blue($color: #000000);
+		position: relative;
+		text-align: center;
+		display: flex;
+	}
+	nav .menu-item-search {
+		color: blue($color: #000000);
+		padding: 10px;
+		position: relative;
+		text-align: center;
+		border-bottom: 3px solid transparent;
+		display: flex;
+		width: 100%;
+		height: 100%;
+	}
+	nav .menu-item-invidivue {
+		visibility: hidden;
+	}
+}
 </style>
