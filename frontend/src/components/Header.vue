@@ -3,7 +3,7 @@
 		<nav>
 			<router-link to="/" class="menu-item-invidivue">INVIDIVUE</router-link>
 			<div class="menu-item-search search">
-				<input placeholder="Search something" />
+				<input class="searchBar" placeholder="Search something" />
 			</div>
 			<div>
 				<router-link to="/" class="menu-item-top" @click="store.dispatch('logout')">Logout</router-link>
@@ -34,20 +34,20 @@ a {
 	color: #ffffff;
 	text-decoration: none;
 }
-input {
+.searchBar {
 	background-color: #232323;
 	padding-bottom: 10px;
 
 	color: #ffffff;
 	font-size: 100%;
-	text-align: center;
+	text-align: left;
 
 	border: none;
 	border-bottom: 1px solid;
 
 	width: 90%;
 }
-input:focus {
+.searchBar:focus {
 	outline: none;
 }
 div .search {
@@ -57,8 +57,6 @@ nav {
 	height: 100%;
 	display: flex;
 	align-items: center;
-	margin-left: 5vw;
-	margin-right: 5vw;
 }
 
 nav .menu-item {
