@@ -2,7 +2,6 @@
 	<div class="center">
 		<form class="loginForm">
 			<fieldset>
-				<p>Login</p>
 				<label>Username</label>
 				<input type="text" v-model="form.username" required />
 				<label>Password</label>
@@ -87,10 +86,8 @@ export default {
 	border: none;
 }
 button {
-	width: 15%;
 	font-size: 100%;
 	margin-top: 0.5em;
-	margin-right: auto;
 	padding: 0.5em 1em;
 	background-color: #a0a0a0;
 	box-shadow: none;
