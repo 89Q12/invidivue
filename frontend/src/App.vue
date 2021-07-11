@@ -24,5 +24,13 @@ body {
 	margin: 0%;
 	background-color: #232323;
 }
-
+div .center {
+	height: 100%;
+	margin-right: 25%;
+	margin-left: 25%;
+}
+#app {
+	margin-left: 5vw;
+	margin-right: 5vw;
+}
 </style>
