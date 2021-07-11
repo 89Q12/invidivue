@@ -1,14 +1,16 @@
 <template>
 	<header>
 		<nav>
-			<router-link to="/" class="menu-item-invidivue">INVIDIVUE</router-link>
-			<div class="menu-item-search search">
+			<div class="start">
+				<router-link to="/">INVIDIVUE</router-link>
+			</div>
+			<div class="menu-item-search">
 				<input class="searchBar" placeholder="Search something" />
 			</div>
-			<div>
+			<div v-show="false">
 				<router-link to="/" class="menu-item-top" @click="store.dispatch('logout')">Logout</router-link>
 			</div>
-			<div>
+			<div class="end">
 				<router-link to="/signin" class="menu-item-top">Login</router-link>
 			</div>
 		</nav>
@@ -45,30 +47,41 @@ a {
 	border: none;
 	border-bottom: 1px solid;
 
-	width: 90%;
+	width: 100%;
 }
 .searchBar:focus {
 	outline: none;
 }
-div .search {
-	width: 20%;
-}
+
 nav {
 	height: 100%;
 	display: flex;
+	flex-flow: row wrap;
+	align-items: center;
+	justify-content: center;
+}
+nav div {
+	width: 33.33%;
+}
+nav .end {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-end;
+	align-items: center;
+}
+nav .start {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
 	align-items: center;
 }
 
 nav .menu-item {
 	color: blue($color: #000000);
 	padding: 10px 40px;
-	position: relative;
 
 	text-align: center;
 	border-bottom: 3px solid transparent;
-
-	display: flex;
-	transition: 400ms;
 }
 
 nav .menu-item.active,
@@ -84,13 +97,9 @@ nav .menu-item a {
 
 nav .menu-item-top {
 	color: blue($color: #000000);
-	padding: 10px 30px;
 	position: relative;
 	text-align: center;
 	border-bottom: 3px solid transparent;
-	display: flex;
-	transition: 400ms;
-	margin-left: auto;
 }
 nav .menu-item-search {
 	color: blue($color: #000000);
@@ -98,29 +107,6 @@ nav .menu-item-search {
 	position: relative;
 	text-align: center;
 	border-bottom: 3px solid transparent;
-	display: flex;
-	margin: auto;
-}
-nav .menu-item-invidivue {
-	color: blue($color: #000000);
-	font-size: 100%;
-	font-weight: bold;
-}
-
-nav .menu-item-logout {
-	color: #ffffff;
-	background-color: #ffffff00;
-	padding: 10px 30px;
-	position: relative;
-	text-align: center;
-	border: 0px solid transparent;
-	display: flex;
-	transition: 400ms;
-
-	nav .menu-item-logout.active,
-	nav .menu-item-logout:hover {
-		background-color: #000000;
-	}
 }
 
 nav .menu-item-top.active,
@@ -132,17 +118,17 @@ nav .menu-item-top a {
 	color: inherit;
 	text-decoration: none;
 }
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 650px) {
 	nav {
 		height: 100%;
 		width: 100%;
 		display: flex;
+		justify-content: center;
 	}
 	nav .menu-item-top {
 		color: blue($color: #000000);
 		position: relative;
 		text-align: center;
-		display: flex;
 	}
 	nav .menu-item-search {
 		color: blue($color: #000000);
@@ -150,12 +136,20 @@ nav .menu-item-top a {
 		position: relative;
 		text-align: center;
 		border-bottom: 3px solid transparent;
-		display: flex;
 		width: 100%;
 		height: 100%;
 	}
-	nav .menu-item-invidivue {
-		visibility: hidden;
+	nav .end {
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+	}
+	nav .start {
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
 	}
 }
 </style>
