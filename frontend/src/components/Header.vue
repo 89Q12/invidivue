@@ -2,7 +2,7 @@
 	<header>
 		<nav>
 			<div class="start">
-				<router-link to="/">INVIDIVUE</router-link>
+				<router-link to="/" class="menu-item-invidivue">INVIDIVUE</router-link>
 			</div>
 			<div class="menu-item-search">
 				<input class="searchBar" placeholder="Search something" />
@@ -77,9 +77,7 @@ nav .start {
 }
 
 nav .menu-item {
-	color: blue($color: #000000);
 	padding: 10px 40px;
-
 	text-align: center;
 	border-bottom: 3px solid transparent;
 }
@@ -96,17 +94,21 @@ nav .menu-item a {
 }
 
 nav .menu-item-top {
-	color: blue($color: #000000);
 	position: relative;
 	text-align: center;
 	border-bottom: 3px solid transparent;
 }
 nav .menu-item-search {
-	color: blue($color: #000000);
 	padding: 10px;
 	position: relative;
 	text-align: center;
 	border-bottom: 3px solid transparent;
+}
+nav .menu-item-invidivue {
+	padding: 10px;
+	position: relative;
+	text-align: center;
+	font-weight: bold;
 }
 
 nav .menu-item-top.active,
@@ -137,7 +139,6 @@ nav .menu-item-top a {
 		text-align: center;
 		border-bottom: 3px solid transparent;
 		width: 100%;
-		height: 100%;
 	}
 	nav .end {
 		display: flex;
