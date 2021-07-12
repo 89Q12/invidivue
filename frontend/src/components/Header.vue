@@ -20,7 +20,7 @@
 header {
 	top: 0;
 	width: 100%;
-	height: 10vh;
+	height: 5em;
 	z-index: 999;
 
 	.o-switch__label {
@@ -38,7 +38,7 @@ a {
 }
 .searchBar {
 	background-color: #232323;
-	padding-bottom: 10px;
+	padding: 10px;
 
 	color: #ffffff;
 	font-size: 100%;
@@ -99,7 +99,6 @@ nav .menu-item-top {
 	border-bottom: 3px solid transparent;
 }
 nav .menu-item-search {
-	padding: 10px;
 	position: relative;
 	text-align: center;
 	border-bottom: 3px solid transparent;
