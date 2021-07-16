@@ -270,6 +270,30 @@ const updateUser = async (req: Request, res: Response): Promise<void> => {
 	}
 };
 const allUsers = async (req: Request, res: Response): Promise<any> => {
+	const conn = await connection;
+	const users = await conn.manager.getRepository(User);
+	let take = 20;
+	let skip = 0;
+	if(req.query["c"]){
+		take = Number(req.query["c"]);
+	}
+	if(req.query["s"]){
+		skip=Number(req.query["s"]);
+	}
+	const [result, total] = await users.findAndCount(
+        {
+			select: ["id", "name","created"],
+            take: take,
+            skip: skip
+        }
+    );
+	return res.status(200).json({
+		message: 'OK',
+		users:result
+	});
+	return res.status(400).json({
+		message: 'not implemented',
+	});
 	/*User.find({})
 		.then((users) => res.status(200).send(users))
 		.catch((err) =>

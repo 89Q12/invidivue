@@ -1,0 +1,1 @@
+type InternalServerError = "Internal server error.";

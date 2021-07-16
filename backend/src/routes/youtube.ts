@@ -10,4 +10,6 @@ router.get('/results', controller.getResults)
 router.get('/r', controller.getResults)
 router.get('/channel/:cId', controller.getChannel)
 router.get('/c/:cId', controller.getChannel)
+router.get('/subscribe', controller.subscribe)
+
 export { router };
