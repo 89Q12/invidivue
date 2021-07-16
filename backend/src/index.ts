@@ -19,7 +19,7 @@ const app = express();
 /*
  * Verbindung mit der Datenbank aufbauen
  */
-const url = `mongodb://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@${process.env.MONGO_HOST}`;
+/*const url = `mongodb://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@${process.env.MONGO_HOST}`;
 
 const opts = {
 	useUnifiedTopology: true,
@@ -38,7 +38,7 @@ mongoose
 	})
 	.catch((error) => {
 		logging.error(NAMESPACE, error.message, error);
-	});
+	});*/
 
 /**
  * Log the request
@@ -81,7 +81,9 @@ app.use(cors({ credentials: true, origin: ['http://localhost:8080', 'http://loca
  *  Routes go here
  *  */
 app.use('/api/user', userRoutes.router);
+app.use('/au', userRoutes.router);
 app.use('/api/youtube', userYoutube.router);
+app.use('/ay', userYoutube.router);
 /**
  * Error handling
  *  */

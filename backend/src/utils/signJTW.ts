@@ -4,16 +4,16 @@ import IEUser from '../interfaces/IEUser';
 
 const NAMESPACE = 'Auth';
 
-const signJWT = (user: IEUser, callback: (error: Error | null, token: string | null) => void): void => {
+const signJWT = (user_id: string, callback: (error: Error | null, token: string | null) => void): void => {
 	const date = new Date();
 	date.setSeconds(Date.now() + parseInt(process.env.SERVER_TOKEN_EXPIRETIME_ACCESS));
 	const expiredAt = parseInt(process.env.SERVER_TOKEN_EXPIRETIME_ACCESS);
-	logging.info(NAMESPACE, `Attempting to sign token for ${user._id}`);
+	logging.info(NAMESPACE, `Attempting to sign token for ${user_id}`);
 	logging.info(NAMESPACE, 'Expires in:' + date.toTimeString());
 	try {
 		sign(
 			{
-				sub: user._id,
+				sub: user_id,
 				iat: Math.floor(Date.now() / 1000),
 			},
 			process.env.SERVER_TOKEN_SECRET,

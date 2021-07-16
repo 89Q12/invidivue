@@ -1,17 +1,37 @@
 import { Request, Response } from 'express';
 import { Types } from 'mongoose';
 import { hash, compare } from 'bcrypt';
-import User from '../models/user';
+//import User from '../models/user';
+import {User} from '../entity/User';
 import RefreshToken from '../models/refreshToken';
 import IEUser from '../interfaces/IEUser';
 import signJWT from '../utils/signJTW';
-
+import {createConnection} from "typeorm";
+var connection = createConnection();
 // Register Funktion
 const register = async (req: Request, res: Response): Promise<Response> => {
-	const { username, password, email, admin } = req.body;
-	const resultname = await User.findOne({ username });
-	const resultemail = await User.findOne({ email });
-	if (resultname || resultemail) {
+	const { username, password} = req.body;
+	const conn = await connection;
+	const users = await conn.manager.getRepository(User);
+	const name = await users.findOne({name:username});
+	if(name){
+		return res.status(400).json({
+			message: 'user already exists!',
+		});
+	}else{
+		const user = new User();
+		user.name=username;
+		user.password=await hash(password,1);
+		conn.manager.save(user);
+		return res.status(200).json({
+			message: 'succesfully added user',
+		});
+	}
+	
+	return res.status(400).json({
+		message: 'not implemented',
+	});
+	/*if (resultname || resultemail) {
 		return res.status(401).json({
 			message: 'user already exists',
 		});
@@ -44,12 +64,53 @@ const register = async (req: Request, res: Response): Promise<Response> => {
 					error,
 				});
 			});
-	});
+	});*/
 };
 //Login Funktion
-const login = async (req: Request, res: Response): Promise<void> => {
+const login = async (req: Request, res: Response): Promise<Response> => {
 	const { username, password } = req.body;
-	User.findOne({ username })
+	const conn = await connection;
+	const users = conn.manager.getRepository(User);
+	const user = await users.findOne({name:username});
+	if(user){
+		//const hashedpassword=await hash(password,1);
+		//console.log(user.password);
+		compare(password, user.password, (error, result) => {
+			if (error ) {
+				console.log(error);
+				return res.status(500).json({
+					message: 'Internal Server Error.',
+				});
+			} else if (result) {
+				//console.log(result);
+				signJWT(username,async (_error, token) => {
+					
+					if(_error){
+						console.log(_error);
+						return res.status(500).json({
+							message: 'Internal Server Error.',
+						});
+					}else{
+						user.token=token;
+						users.save(user);
+						return res.status(200).json({
+							message: 'Login succesful.',
+							accesstoken: token,
+							user: user.name,
+						});
+					}
+				});
+			}
+		});
+			
+		
+	}else{
+		return res.status(400).json({
+			message: 'User not found or password wrong!',
+		});
+	}
+	
+	/*User.findOne({ username })
 		.exec()
 		.then((user) => {
 			compare(password, user.password, (error, result) => {
@@ -86,7 +147,7 @@ const login = async (req: Request, res: Response): Promise<void> => {
 			res.status(400).json({
 				message: 'User not found',
 			});
-		});
+		});*/
 };
 
 const refreshToken = async (req: Request, res: Response): Promise<Response> => {
@@ -114,7 +175,7 @@ const refreshToken = async (req: Request, res: Response): Promise<Response> => {
 			});
 			return;
 		}
-		signJWT(refreshToken.user, (_error, token) => {
+		signJWT("", (_error, token) => {
 			if (_error) {
 				return res.status(500).json({
 					message: _error.message,
@@ -150,7 +211,7 @@ const getUser = async (req: Request, res: Response): Promise<void> => {
 };
 
 const findUser = async (req: Request, res: Response): Promise<void> => {
-	User.findOne({ _id: req.params.userId })
+	/*User.findOne({ _id: req.params.userId })
 		.exec()
 		.then((user) => {
 			return res.status(200).json({
@@ -162,7 +223,7 @@ const findUser = async (req: Request, res: Response): Promise<void> => {
 				message: error.message,
 				error,
 			});
-		});
+		});*/
 };
 
 const updateUser = async (req: Request, res: Response): Promise<void> => {
@@ -176,7 +237,7 @@ const updateUser = async (req: Request, res: Response): Promise<void> => {
 					error: hashError,
 				});
 			}
-			User.findOneAndUpdate(
+			/*User.findOneAndUpdate(
 				{ _id: req.params.userId },
 				{ username: username, password: hash, email: email, admin: admin },
 				{
@@ -189,10 +250,10 @@ const updateUser = async (req: Request, res: Response): Promise<void> => {
 						message: err.message,
 						err,
 					}),
-				);
+				);*/
 		});
 	} else {
-		User.findOneAndUpdate(
+		/*User.findOneAndUpdate(
 			{ _id: req.params.userId },
 			{ username: username, password: user.password, email: email, admin: admin, favoriten: favoriten },
 			{
@@ -205,18 +266,18 @@ const updateUser = async (req: Request, res: Response): Promise<void> => {
 					message: err.message,
 					err,
 				}),
-			);
+			);*/
 	}
 };
 const allUsers = async (req: Request, res: Response): Promise<any> => {
-	User.find({})
+	/*User.find({})
 		.then((users) => res.status(200).send(users))
 		.catch((err) =>
 			res.status(500).json({
 				message: err.message,
 				err,
 			}),
-		);
+		);*/
 };
 
 const changeName = async (req: Request, res: Response): Promise<void> => {
@@ -224,7 +285,8 @@ const changeName = async (req: Request, res: Response): Promise<void> => {
 	const ID = { _id: req.params.userId };
 	const update = { username: username };
 
-	User.findOneAndUpdate(ID, update, {
+
+	/*User.findOneAndUpdate(ID, update, {
 		new: true,
 	})
 		.then((username) => res.status(200).send(username))
@@ -233,7 +295,7 @@ const changeName = async (req: Request, res: Response): Promise<void> => {
 				message: err.message,
 				err,
 			}),
-		);
+		);*/
 };
 
 const changePassword = async (req: Request, res: Response): Promise<void> => {
@@ -248,7 +310,7 @@ const changePassword = async (req: Request, res: Response): Promise<void> => {
 			});
 		}
 
-		User.findOneAndUpdate(
+		/*User.findOneAndUpdate(
 			ID,
 			{ password: hash },
 			{
@@ -261,7 +323,7 @@ const changePassword = async (req: Request, res: Response): Promise<void> => {
 					message: err.message,
 					err,
 				}),
-			);
+			);*/
 	});
 };
 export default { register, login, findUser, updateUser, logout, getUser, refreshToken, allUsers, changeName, changePassword };
