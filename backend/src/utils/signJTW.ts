@@ -1,6 +1,5 @@
 import { sign } from 'jsonwebtoken';
 import logging from '../config/logging';
-import IEUser from '../interfaces/IEUser';
 
 const NAMESPACE = 'Auth';
 

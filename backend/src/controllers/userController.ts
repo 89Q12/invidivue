@@ -4,15 +4,14 @@ import { hash, compare } from 'bcrypt';
 //import User from '../models/user';
 import {User} from '../entity/User';
 import {Group} from '../entity/Group'
-import RefreshToken from '../models/refreshToken';
-import IEUser from '../interfaces/IEUser';
+import {RefreshToken} from '../entity/RefreshToken';
 import signJWT from '../utils/signJTW';
 import logging from '../config/logging'
 import {createConnection, EntityTarget, Repository} from "typeorm";
+import * as RToken from '../models/refreshToken';
 var connection = createConnection();
 connection.then(async conn=>{
 	const groups = conn.manager.getRepository(Group);
-	console.log("adding standard users");
 	const creategroupifnotexists= async (groups:Repository<Group>,groupname:string):Promise<Group>=>{
 		const admingroup = await groups.findOne({name:groupname});
 		if(admingroup){
@@ -126,6 +125,13 @@ const login = async (req: Request, res: Response): Promise<Response> => {
 					}else{
 						user.token=token;
 						users.save(user);
+						const rtoken=await RToken.default.createToken(user);
+						conn.getRepository(RefreshToken).save(rtoken);
+						res.cookie('refreshtoken', rtoken.token, {
+							httpOnly: true,
+							secure: false,
+							signed: true,
+						});
 						return res.status(200).json({
 							message: 'Login succesful.',
 							accesstoken: token,
@@ -184,14 +190,17 @@ const login = async (req: Request, res: Response): Promise<Response> => {
 };
 
 const refreshToken = async (req: Request, res: Response): Promise<Response> => {
-	const { refreshToken: requestToken } = req.signedCookies;
-
-	if (requestToken == null) {
+	const { refreshtoken: requesttoken } = req.signedCookies;
+	
+	if (requesttoken == null) {
 		return res.status(403).json({ message: 'Refresh Token is required!' });
 	}
 
 	try {
-		const refreshToken = await RefreshToken.findOne({ token: requestToken });
+		const conn = await connection;
+		const rtokens = conn.getRepository(RefreshToken);
+		
+		const refreshToken = await rtokens.findOne({ token: requesttoken })
 
 		if (!refreshToken) {
 			res.clearCookie('refreshToken');
@@ -199,10 +208,10 @@ const refreshToken = async (req: Request, res: Response): Promise<Response> => {
 			return;
 		}
 
-		if (RefreshToken.verifyExpiration(refreshToken)) {
+		if (RToken.default.verifyExpiration(refreshToken)) {
 			res.clearCookie('refreshToken');
-			RefreshToken.findByIdAndRemove(refreshToken._id, { useFindAndModify: false }).exec();
-
+			//findByIdAndRemove(refreshToken._id, { useFindAndModify: false }).exec();
+			rtokens.remove(refreshToken);
 			res.status(403).json({
 				message: 'Refresh token was expired. Please make a new signin request',
 			});
@@ -229,17 +238,17 @@ const logout = async (req: Request, res: Response): Promise<void> => {
 	try {
 		const { refreshToken: requestToken } = req.signedCookies;
 		res.clearCookie('refreshToken');
-		RefreshToken.findOneAndDelete({ token: requestToken }, { useFindAndModify: false })
+		/*RefreshToken.findOneAndDelete({ token: requestToken }, { useFindAndModify: false })
 			.exec()
 			.then(() => res.status(204).json({ message: 'loggedout' }))
-			.catch((err) => res.status(500).json({ message: err }));
+			.catch((err) => res.status(500).json({ message: err }));*/
 	} catch (err) {
 		res.status(400).json({ message: 'user was not logged in' });
 	}
 };
 
 const getUser = async (req: Request, res: Response): Promise<void> => {
-	const user = req.user as IEUser;
+	const user = req.user as User;
 	res.status(200).json(user);
 };
 
@@ -261,7 +270,7 @@ const findUser = async (req: Request, res: Response): Promise<void> => {
 
 const updateUser = async (req: Request, res: Response): Promise<void> => {
 	const { username, password, email, admin, favoriten } = req.body;
-	const user = req.user as IEUser;
+	const user = req.user as User;
 	if (password) {
 		hash(password, 10, (hashError, hash) => {
 			if (hashError) {
@@ -315,9 +324,7 @@ const allUsers = async (req: Request, res: Response): Promise<any> => {
 		.where("user.id=:id",{id:currentuser.id})
 		.where("group.id=:id",{id:group_admin.id})
 		.getOne();
-		logging.info("","",currentuser);
-		logging.info("","",sqlresult);
-		logging.info("","",typeof (sqlresult));
+		
 
 		if(sqlresult){
 			let take = 20;

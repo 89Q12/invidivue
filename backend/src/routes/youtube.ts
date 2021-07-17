@@ -10,6 +10,9 @@ router.get('/results', controller.getResults)
 router.get('/r', controller.getResults)
 router.get('/channel/:cId', controller.getChannel)
 router.get('/c/:cId', controller.getChannel)
-router.get('/subscribe', controller.subscribe)
+
+router.get('/subscribe', passport.authenticate('jwt', { session: false }),controller.subscribe)
+router.get('/unsubscribe', passport.authenticate('jwt', { session: false }),controller.unsubscribe)
+router.get('/subscriptions', passport.authenticate('jwt', { session: false }),controller.getSubscriptions)
 
 export { router };

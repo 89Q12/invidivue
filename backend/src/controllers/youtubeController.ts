@@ -1,9 +1,9 @@
 import { Response } from "express";
 
 // Controller for youtuber routes like getVideoById, getChannelById
-const { Client } = require("youtubei");
-const ytch = require('yt-channel-info');
-const ytdl = require('ytdl-core');
+import  { Client } from "youtubei";
+import * as ytch from 'yt-channel-info';
+import * as ytdl from 'ytdl-core';
 const youtube = new Client();
 //https://www.youtube.com/watch?v=dQw4w9WgXcQ //Just youtube url 
 const getVideoById = async (req, res): Promise<Response> => {
@@ -72,9 +72,46 @@ const getChannel = async (req, res): Promise<Response> => {
     });
 }
 const subscribe = async (req, res): Promise<Response> => {
-
+    if(req.user){
+        if(req.params["cId"]){
+            const channel = await getchannelinfo(req.params["cId"]);
+            
+            return res.status(200).json({
+                message: 'OK',
+                channel:channel
+            });
+        }
+    }else{
+        return res.status(400).json({
+            message: 'not logged in',
+        });
+    }
     return res.status(400).json({
 		message: 'not implemented',
 	});
 }
-export default { getVideoById,getResults,getChannel,subscribe };
+const unsubscribe = async (req, res): Promise<Response> => {
+    if(req.user){
+
+    }else{
+        return res.status(400).json({
+            message: 'not logged in',
+        });
+    }
+    return res.status(400).json({
+		message: 'not implemented',
+	});
+}
+const getSubscriptions = async (req, res): Promise<Response> => {
+    if(req.user){
+
+    }else{
+        return res.status(400).json({
+            message: 'not logged in',
+        });
+    }
+    return res.status(400).json({
+		message: 'not implemented',
+	});
+}
+export default { getVideoById,getResults,getChannel,subscribe,unsubscribe,getSubscriptions };

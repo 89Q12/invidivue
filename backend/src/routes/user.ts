@@ -7,7 +7,7 @@ const router = Router();
 // User routes go here
 router.post('/register', validation(UserRegisterSchema), controller.register);
 router.post('/login', validation(UserLoginSchema), controller.login);
-router.post('/refreshToken', controller.refreshToken);
+router.post('/refreshtoken', controller.refreshToken);
 router.post('/logout', passport.authenticate('jwt', { session: false }), controller.logout);
 router.get('/allusers', passport.authenticate('jwt', { session: false }), controller.allUsers);
 router.post('/changeName/:userId', passport.authenticate('jwt', { session: false }), validation(UserChangeNameSchema), controller.changeName);
