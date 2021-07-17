@@ -3,11 +3,44 @@ import { Types } from 'mongoose';
 import { hash, compare } from 'bcrypt';
 //import User from '../models/user';
 import {User} from '../entity/User';
+import {Group} from '../entity/Group'
 import RefreshToken from '../models/refreshToken';
 import IEUser from '../interfaces/IEUser';
 import signJWT from '../utils/signJTW';
-import {createConnection} from "typeorm";
+import logging from '../config/logging'
+import {createConnection, EntityTarget, Repository} from "typeorm";
 var connection = createConnection();
+connection.then(async conn=>{
+	const groups = conn.manager.getRepository(Group);
+	console.log("adding standard users");
+	const creategroupifnotexists= async (groups:Repository<Group>,groupname:string):Promise<Group>=>{
+		const admingroup = await groups.findOne({name:groupname});
+		if(admingroup){
+		}else{
+			const group = new Group();
+			group.name=groupname;
+			groups.save(group);
+			return group;
+		}
+		return admingroup;
+	};
+	const group_admin = await creategroupifnotexists(groups,"admin");
+	const group_user = await creategroupifnotexists(groups,"user");
+
+	const users = conn.manager.getRepository(User);
+	const username = process.env.SERVER_ADMIN_NAME;
+	const name = await users.findOne({name:username});
+	if(name){
+	}else{
+		console.log("adding admin");
+		const user = new User();
+		user.name=process.env.SERVER_ADMIN_NAME;
+		user.password=await hash(process.env.SERVER_ADMIN_PASSWORD,1);
+		user.groups=[group_admin,group_user];
+		conn.manager.save(user);
+	}
+	
+});
 // Register Funktion
 const register = async (req: Request, res: Response): Promise<Response> => {
 	const { username, password} = req.body;
@@ -271,26 +304,47 @@ const updateUser = async (req: Request, res: Response): Promise<void> => {
 };
 const allUsers = async (req: Request, res: Response): Promise<any> => {
 	const conn = await connection;
-	const users = await conn.manager.getRepository(User);
-	let take = 20;
-	let skip = 0;
-	if(req.query["c"]){
-		take = Number(req.query["c"]);
+	//console.log(req.user);
+	if(req.user){
+		const users = await conn.manager.getRepository(User);
+		const currentuser = await users.findOne(req.user);
+		const groups = await conn.manager.getRepository(Group);
+		const group_admin = await groups.findOne({name:"admin"});
+		const sqlresult= await users.createQueryBuilder("user")
+		.leftJoinAndSelect("user.groups","group")
+		.where("user.id=:id",{id:currentuser.id})
+		.where("group.id=:id",{id:group_admin.id})
+		.getOne();
+		logging.info("","",currentuser);
+		logging.info("","",sqlresult);
+		logging.info("","",typeof (sqlresult));
+
+		if(sqlresult){
+			let take = 20;
+			let skip = 0;
+			if(req.query["c"]){
+				take = Number(req.query["c"]);
+			}
+			if(req.query["s"]){
+				skip=Number(req.query["s"]);
+			}
+			const [result, total] = await users.findAndCount(
+				{
+					select: ["id", "name","created"],
+					take: take,
+					skip: skip
+				}
+			);
+			return res.status(200).json({
+				message: 'OK',
+				users:result
+			});
+		}else{
+			return res.status(400).json({
+				message: 'no permission',
+			});
+		}
 	}
-	if(req.query["s"]){
-		skip=Number(req.query["s"]);
-	}
-	const [result, total] = await users.findAndCount(
-        {
-			select: ["id", "name","created"],
-            take: take,
-            skip: skip
-        }
-    );
-	return res.status(200).json({
-		message: 'OK',
-		users:result
-	});
 	return res.status(400).json({
 		message: 'not implemented',
 	});
