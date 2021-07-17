@@ -6,6 +6,7 @@ const options = {
 	jwtFromRequest: JwtStrategy.ExtractJwt.fromAuthHeaderAsBearerToken(),
 	secretOrKey: process.env.SERVER_TOKEN_SECRET,
 	algorithms: ['HS256'],
+	passReqToCallback: true
 };
 /*
 
@@ -13,7 +14,7 @@ const options = {
 const passportStrat = (passport): any => {
 	
 	passport.use(
-		new JwtStrategy.Strategy(options, async function (jwt_payload, done) {
+		new JwtStrategy.Strategy(options, async function (req,jwt_payload, done) {
 			//console.log(jwt_payload);
 			const conn = await connection;
 			const users = await conn.manager.getRepository(User);

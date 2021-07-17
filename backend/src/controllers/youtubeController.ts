@@ -4,6 +4,11 @@ import { Response } from "express";
 import  { Client } from "youtubei";
 import * as ytch from 'yt-channel-info';
 import * as ytdl from 'ytdl-core';
+
+import {createConnection, EntityTarget, Repository} from "typeorm";
+import { Channel } from "../entity/Channel";
+import { User } from "../entity/User";
+var connection = createConnection();
 const youtube = new Client();
 //https://www.youtube.com/watch?v=dQw4w9WgXcQ //Just youtube url 
 const getVideoById = async (req, res): Promise<Response> => {
@@ -50,16 +55,16 @@ const getchannelinfo =async (id:string) =>{
     const chanid= encodeURIComponent(id);
     const channel = await ytch.getChannelInfo(chanid);
     return channel;
-}
+};
 const getvideos = async (channelId:string,sortBy:string) => {
     return await ytch.getChannelVideos(channelId, sortBy); 
-}
+};
 const getnewestvideos = async (channelId:string) => {
     getvideos(channelId,'newest');
-}
+};
 const getChannel = async (req, res): Promise<Response> => {
-    if(req.params["cId"]){
-        const channel = await getchannelinfo(req.params["cId"])
+    if(req.params["cid"]){
+        const channel = await getchannelinfo(req.params["cid"])
         const videos = await getnewestvideos(channel.channelId);
         return res.status(200).json({
             message: 'OK',
@@ -70,15 +75,83 @@ const getChannel = async (req, res): Promise<Response> => {
     return res.status(400).json({
         message: 'No channel id',
     });
-}
+};
+const subscribeuser= async (channel:Channel,user:User):Promise<boolean> => {
+    const conn = await connection;
+    const users = conn.getRepository(User);
+    const sqlresult= await users.createQueryBuilder("user")
+    .leftJoinAndSelect("user.subscriptions","channel")
+    .where("user.id=:id",{id:user.id})
+    .where("channel.id=:id",{id:channel.id})
+    .getOne();
+    if(sqlresult){
+        return false;
+    }else{
+        if(user.subscriptions==undefined)user.subscriptions=[];
+        user.subscriptions.push(channel);
+        users.save(user);
+        return true;
+    }
+    return false;
+    
+};
 const subscribe = async (req, res): Promise<Response> => {
     if(req.user){
-        if(req.params["cId"]){
-            const channel = await getchannelinfo(req.params["cId"]);
-            
-            return res.status(200).json({
-                message: 'OK',
-                channel:channel
+        //console.log(req);
+        if(req.query["cid"]){
+            const cid = req.query.cid;
+            const conn = await connection;
+            const channels = conn.getRepository(Channel);
+            const users = conn.getRepository(User);
+            const user = await users.findOne(req.user,{ relations: ["subscriptions"] });
+            if(user){
+                const dbchan = await channels.findOne({channelid:cid});
+                if(dbchan){
+                        
+                    if(await subscribeuser(dbchan,user)){
+                        return res.status(200).json({
+                            message: 'OK'
+                        });
+                       }else{
+                        return res.status(200).json({
+                            message: 'already subscribed'
+                        });
+                       }
+                }else{
+                    const channel = await getchannelinfo(cid);
+                    console.log(channel);
+                    if(channel){
+                        const newchannel = new Channel();
+                        newchannel.channelid=channel.authorId;
+                        channels.save(newchannel);
+
+                        
+                       if(await subscribeuser(newchannel,user)){
+                        return res.status(200).json({
+                            message: 'OK'
+                        });
+                       }else{
+                        return res.status(200).json({
+                            message: 'already subscribed'
+                        });
+                       }
+
+                        
+                        
+                    }else{
+                        return res.status(400).json({
+                            message: 'not a channel id',
+                        });
+                    }
+                }
+            }else{
+                return res.status(400).json({
+                    message: 'not logged in',
+                });
+            }
+        }else{
+            return res.status(400).json({
+                message: 'no channel id',
             });
         }
     }else{
@@ -89,10 +162,45 @@ const subscribe = async (req, res): Promise<Response> => {
     return res.status(400).json({
 		message: 'not implemented',
 	});
-}
+};
 const unsubscribe = async (req, res): Promise<Response> => {
     if(req.user){
-
+        if(req.query.cid){
+            const cid = req.query.cid;
+            const conn = await connection;
+            const channels = conn.getRepository(Channel);
+            const users = conn.getRepository(User);
+            const user = await users.findOne(req.user,{ relations: ["subscriptions"] });
+            if(user){
+                const dbchan = await channels.findOne({channelid:cid});
+                if(dbchan){
+                    let flag = false;
+                    console.log(dbchan.id);
+                    const newsubs = user.subscriptions.filter(channel=>{
+                            return channel.id !== dbchan.id
+                    });
+                    user.subscriptions=newsubs;
+                    users.save(user);
+                    if(flag){
+                        return res.status(200).json({
+                            message: 'OK',
+                        });
+                    }else{
+                        return res.status(400).json({
+                            message: 'channel not subscribed',
+                        });
+                    }
+                }else{
+                    return res.status(400).json({
+                        message: 'channel not found',
+                    });
+                }
+            }else{
+                return res.status(400).json({
+                    message: 'user not found',
+                });
+            }
+        }
     }else{
         return res.status(400).json({
             message: 'not logged in',
@@ -101,10 +209,18 @@ const unsubscribe = async (req, res): Promise<Response> => {
     return res.status(400).json({
 		message: 'not implemented',
 	});
-}
+};
 const getSubscriptions = async (req, res): Promise<Response> => {
     if(req.user){
-
+        const conn = await connection;
+        const users = conn.getRepository(User);
+        const user = await users.findOne(req.user);
+        if(user){
+            return res.status(200).json({
+                message: 'OK',
+                subscribtions:user.subscriptions
+            });
+        }
     }else{
         return res.status(400).json({
             message: 'not logged in',
@@ -113,5 +229,5 @@ const getSubscriptions = async (req, res): Promise<Response> => {
     return res.status(400).json({
 		message: 'not implemented',
 	});
-}
+};
 export default { getVideoById,getResults,getChannel,subscribe,unsubscribe,getSubscriptions };
