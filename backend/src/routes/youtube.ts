@@ -14,5 +14,6 @@ router.get('/c/:cId', controller.getChannel)
 router.get('/subscribe', passport.authenticate('jwt', { session: false }),controller.subscribe)
 router.get('/unsubscribe', passport.authenticate('jwt', { session: false }),controller.unsubscribe)
 router.get('/subscriptions', passport.authenticate('jwt', { session: false }),controller.getSubscriptions)
+router.post('/uploadnewpipesubs', passport.authenticate('jwt', { session: false }),controller.uploadnewpipesubs)
 
 export { router };
