@@ -88,15 +88,20 @@ const getcachedchannel= async (channelid:string) => {
     return {};
 }
 const getvideos = async (channelId:string,sortBy:string) => {
-    return await ytch.getChannelVideos(channelId, sortBy); 
+    //ytch.getChannelVideos(channelId, sortBy);
+    
+   return await ytch.getChannelVideos(channelId, sortBy); 
+    
+
 };
 const getnewestvideos = async (channelId:string) => {
-    getvideos(channelId,'newest');
+    return await getvideos(channelId,'newest');
 };
 const getChannel = async (req, res): Promise<Response> => {
     if(req.params["cid"]){
         const channel = await getcachedchannel(req.params["cid"])
-        const videos = await getnewestvideos(channel.channelId);
+        const videos = await getnewestvideos(channel.authorId);
+        console.log(videos);
         return res.status(200).json({
             message: 'OK',
             channel:channel,
