@@ -1,4 +1,5 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
+const url = 'http://localhost:5000/api/youtube';
 export const video_store_module = {
 	state: () => ({
 		popular_videos: [],
@@ -31,7 +32,7 @@ export const video_store_module = {
 	actions: {
 		async get_popular(context: any) {
 			try {
-				const response: AxiosResponse = await axios.get('route to popular');
+				const response: AxiosResponse = await axios.get(url + 'route to popular');
 				context.commit('set_popular', response.data);
 			} catch (err: any) {
 				context.commit('set_error', err);
@@ -39,7 +40,7 @@ export const video_store_module = {
 		},
 		async get_trends(context: any) {
 			try {
-				const response: AxiosResponse = await axios.get('route to trends');
+				const response: AxiosResponse = await axios.get(url + 'route to trends');
 				context.commit('set_trend_videos', response.data);
 			} catch (err: any) {
 				context.commit('set_error', err);
@@ -47,15 +48,15 @@ export const video_store_module = {
 		},
 		async get_current_video(context: any, videoID: string) {
 			try {
-				const response: AxiosResponse = await axios.get('/watch?v=' + videoID);
-				context.commit('set_current_video', response.data);
+				const response: AxiosResponse = await axios.get(url + '/watch?v=' + videoID);
+				context.commit('set_current_video', response.data.url);
 			} catch (err: any) {
 				context.commit('set_error', err);
 			}
 		},
 		async get_channel(context: any, channelID: string) {
 			try {
-				const response: AxiosResponse = await axios.get('/channel/' + channelID);
+				const response: AxiosResponse = await axios.get(url + '/channel/' + channelID);
 				context.commit('set_channel', response.data);
 			} catch (err: any) {
 				context.commit('set_error', err);
@@ -63,8 +64,8 @@ export const video_store_module = {
 		},
 		async get_search_result(context: any, search_query: string) {
 			try {
-				const response: AxiosResponse = await axios.get('/results?q=' + search_query);
-				context.commit('set_search_result', response.data);
+				const response: AxiosResponse = await axios.get(url + '/results?q=' + search_query);
+				context.commit('set_search_result', response.data.ytvideos);
 			} catch (err: any) {
 				context.commit('set_error', err);
 			}
