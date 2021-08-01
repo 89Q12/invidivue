@@ -23,6 +23,14 @@ const routes: Array<RouteRecordRaw> = [
 		// which is lazy-loaded when the route is visited.
 		component: () => import(/* webpackChunkName: "search" */ '../views/Search.vue'),
 	},
+	{
+		path: '/video',
+		name: 'video',
+		// route level code-splitting
+		// this generates a separate chunk (search.[hash].js) for this route
+		// which is lazy-loaded when the route is visited.
+		component: () => import(/* webpackChunkName: "video" */ '../views/video.vue'),
+	},
 ];
 
 const router = createRouter({
