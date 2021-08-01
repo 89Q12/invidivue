@@ -1,41 +1,37 @@
 <template>
-  <div id="app">
-    <form v-on:submit.prevent="noop">
-      <input name="query" v-model="name" v-on:keydown="validateInput" placeholder="">
-      <button type="submit" @click="handleSubmit">Search</button>    
-      </form>
-      <p>{{ log }}</p>
-  </div>
-    
+	<div class="results">
+		<div v-for="video in results" v-bind:key="video" class="vid">
+			<a @click="watchWithId(video.id)"
+				><img :src="video.thumbnails[0].url" :height="video.thumbnails[0].height" :width="video.thumbnails[0].width" />
+				{{ video.duration / 100 }} Min</a
+			>
+			<p>{{ video.title }}</p>
+			<p>{{ video.channel.name }}</p>
+			<p>{{ video.uploadDate }} {{ video.viewCount / 1000 }}K</p>
+		</div>
+	</div>
 </template>
 
-<script>
+<script lang="ts">
+import { ref, computed } from 'vue';
+import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
 export default {
-  data() {
-    return {
-      name: ""    ,
-      log:""
-      };  
-  },
-  watch: {
-    // call again the method if the route changes
-    '$route': 'search'
-  },
-  methods: {
-
-    validateInput: function(e) {
-      if (e.keyCode === 13) {
-        this.handleSubmit();
-      }     
-    },
-    
-    handleSubmit: function() {
-      
-        this.log =this.name  ;
-    },
-    noop () {
-      // do nothing ?
-    }
-  }
+	setup() {
+		const store = useStore();
+		const router = useRouter();
+		const results = computed(() => store.state.video_store_module.search_results);
+		async function watchWithId(id: string) {
+			await store.dispatch('get_current_video', id);
+			localStorage.setItem('current_video', id);
+			router.push('video');
+		}
+		return {
+			results,
+			watchWithId,
+			router,
+			store,
+		};
+	},
 };
 </script>
