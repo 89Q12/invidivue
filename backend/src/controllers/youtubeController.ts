@@ -14,7 +14,7 @@ const youtube = new Client();
 const getVideoById = async (req, res): Promise<Response> => {
     if(req.query["v"]){
         const url = await ytdl.getInfo('http://www.youtube.com/watch?v='+encodeURIComponent(req.query["v"]));
-        console.log(url);
+        //console.log(url);
         return res.status(200).json({
             message: 'OK',
             url:url,
@@ -51,21 +51,57 @@ const getResults = async (req, res): Promise<Response> => {
         message: 'No search query',
     });
 };
+
 const getchannelinfo =async (id:string) =>{
     const chanid= encodeURIComponent(id);
     const channel = await ytch.getChannelInfo(chanid);
     return channel;
 };
+const getcachedchannel= async (channelid:string) => {
+    const conn = await connection;
+    const channels = conn.getRepository(Channel);
+    const dbchan = await channels.findOne({channelid:channelid});
+    if(dbchan){
+        let json= {}
+        if(dbchan.cache==""){
+            const channel = await getchannelinfo(channelid);
+            json = channel;
+            dbchan.cache=JSON.stringify(channel);
+            channels.save(dbchan);
+        }else{
+            json= JSON.parse(dbchan.cache);
+        }
+        json["dbchannel"] = dbchan;
+        return json;
+    }else{
+        const channel = await getchannelinfo(channelid);
+        //console.log(channel);
+        if(channel){
+            const newchannel = new Channel();
+            newchannel.channelid=channel.authorId;
+            newchannel.cache=JSON.stringify(channel);
+            channels.save(newchannel);
+            channel["dbchannel"] = newchannel;
+            return channel;
+        }
+    }
+    return {};
+}
 const getvideos = async (channelId:string,sortBy:string) => {
-    return await ytch.getChannelVideos(channelId, sortBy); 
+    //ytch.getChannelVideos(channelId, sortBy);
+    
+   return await ytch.getChannelVideos(channelId, sortBy); 
+    
+
 };
 const getnewestvideos = async (channelId:string) => {
-    getvideos(channelId,'newest');
+    return await getvideos(channelId,'newest');
 };
 const getChannel = async (req, res): Promise<Response> => {
     if(req.params["cid"]){
-        const channel = await getchannelinfo(req.params["cid"])
-        const videos = await getnewestvideos(channel.channelId);
+        const channel = await getcachedchannel(req.params["cid"])
+        const videos = await getnewestvideos(channel.authorId);
+        console.log(videos);
         return res.status(200).json({
             message: 'OK',
             channel:channel,
@@ -95,6 +131,7 @@ const subscribeuser= async (channel:Channel,user:User):Promise<boolean> => {
     return false;
     
 };
+
 const subscribe = async (req, res): Promise<Response> => {
     if(req.user){
         //console.log(req);
@@ -118,7 +155,7 @@ const subscribe = async (req, res): Promise<Response> => {
                         });
                        }
                 }else{
-                    const channel = await getchannelinfo(cid);
+                    const channel = await getcachedchannel(cid);
                     console.log(channel);
                     if(channel){
                         const newchannel = new Channel();
@@ -230,4 +267,52 @@ const getSubscriptions = async (req, res): Promise<Response> => {
 		message: 'not implemented',
 	});
 };
-export default { getVideoById,getResults,getChannel,subscribe,unsubscribe,getSubscriptions };
+
+const uploadnewpipesubs = async (req, res): Promise<Response> => {
+    if(req.user){
+        const conn = await connection;
+        const users = conn.getRepository(User);
+        const user = await users.findOne(req.user,{ relations: ["subscriptions"] });
+        //console.log(req.body);
+        if(user){
+            const subs = req.body;
+            if(subs["subscriptions"]){
+                let failed= 0;
+                let added= 0;
+                subs["subscriptions"].forEach(async e => {
+                   const channelurl = e.url;
+                   if(channelurl.search("https://www.youtube.com/channel/")==0){
+                        const channelid= channelurl.substr('https://www.youtube.com/channel/'.length);
+                        const channel = await getcachedchannel(channelid);
+                        //console.log(channel);
+                        if(!await subscribeuser(channel["dbchannel"],user)){
+                            failed++;
+                        }else{
+                            added++;
+                        }
+                   }
+                });
+                return res.status(200).json({
+                    message: 'OK',
+                    added:added,
+                    failed:failed
+                });
+            }
+            
+            return res.status(200).json({
+                message: 'OK'
+            });
+            return res.status(400).json({
+                message: 'not implemented',
+            });
+        }
+    }else{
+        return res.status(400).json({
+            message: 'not logged in',
+        });
+    }
+    return res.status(400).json({
+		message: 'not implemented',
+	});
+};
+export default { getVideoById,getResults,getChannel,subscribe,unsubscribe,getSubscriptions,uploadnewpipesubs };
