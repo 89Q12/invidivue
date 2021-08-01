@@ -1,8 +1,7 @@
-import { createStore } from "vuex";
-
+import { createStore } from 'vuex';
+import { video_store_module } from './modules/video_store_module';
 export default createStore({
-  state: {},
-  mutations: {},
-  actions: {},
-  modules: {},
+	modules: {
+		video_store_module,
+	},
 });
