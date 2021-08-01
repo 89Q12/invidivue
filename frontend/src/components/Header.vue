@@ -5,7 +5,7 @@
 				<router-link to="/" class="menu-item-invidivue">INVIDIVUE</router-link>
 			</div>
 			<div class="menu-item-search">
-				<input class="searchBar" placeholder="Search something" />
+				<input class="searchBar" v-model="searchParams" @keyup.enter="search()" placeholder="Search something" />
 			</div>
 			<div v-show="false">
 				<router-link to="/" class="menu-item-top" @click="store.dispatch('logout')">Logout</router-link>
@@ -16,6 +16,31 @@
 		</nav>
 	</header>
 </template>
+
+<script lang="ts">
+import { ref } from 'vue';
+import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
+export default {
+	setup() {
+		const searchParams = ref<string>('');
+		const store = useStore();
+		const router = useRouter();
+		async function search() {
+			if (searchParams.value != '') {
+				await store.dispatch('get_search_result', searchParams.value);
+				router.push('search');
+			}
+		}
+		return {
+			searchParams,
+			store,
+			search,
+		};
+	},
+};
+</script>
+
 <style lang="scss">
 header {
 	top: 0;
