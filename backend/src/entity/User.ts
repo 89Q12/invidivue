@@ -1,6 +1,7 @@
 import {Entity, PrimaryGeneratedColumn, Column,ManyToMany, JoinTable} from "typeorm";
 import { Channel } from "./Channel";
 import { Group } from "./Group";
+import { Watch } from "./Watch";
 @Entity()
 export class User {
     @PrimaryGeneratedColumn()id: number;
@@ -16,5 +17,9 @@ export class User {
     @JoinTable()
     @ManyToMany(type => Group, group=>group.id)
     groups: Group[];
+
+    @JoinTable()
+    @ManyToMany(type => Watch, watch => watch.id)
+    watch: Watch[];
 }
 

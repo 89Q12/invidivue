@@ -1,7 +1,7 @@
 <template>
 	<div class="video">
 		<div v-if="video" class="player">
-			<video :src="video.formats[0].url"></video>
+			<video :src="video.formats[0].url" controls autoplay></video>
 		</div>
 		<div class="videoInfo">
 			<p>{{ video.videoDetails.title }}</p>
@@ -10,7 +10,7 @@
 			<p>Views: {{ video.videoDetails.viewCount / 1000 }}K</p>
 			<p>Likes: {{ video.videoDetails.likes / 1000 }}K</p>
 			<p>dislikes: {{ video.videoDetails.dislikes / 1000 }}K</p>
-			{{ video.videoDetails.description }}
+			<p style="white-space: pre-line;">{{ video.videoDetails.description }}</p>
 		</div>
 		<div v-for="vid in video.related_videos" v-bind:key="vid" class="related">
 			<a @click="watchWithId(vid.id)"

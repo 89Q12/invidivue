@@ -101,6 +101,7 @@ const getChannel = async (req, res): Promise<Response> => {
     if(req.params["cid"]){
         const channel = await getcachedchannel(req.params["cid"])
         const videos = await getnewestvideos(channel.authorId);
+        channel.dbchannel = {};
         console.log(videos);
         return res.status(200).json({
             message: 'OK',

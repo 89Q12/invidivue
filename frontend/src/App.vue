@@ -23,6 +23,7 @@ body {
 	padding: 0%;
 	margin: 0%;
 	background-color: #232323;
+	color: #a0a0a0;
 }
 div .center {
 	height: 100%;
@@ -32,5 +33,28 @@ div .center {
 #app {
 	margin-left: 5vw;
 	margin-right: 5vw;
+}
+#duration{
+	position: absolute;
+	right: 0.25em;
+	bottom: -0.5em;
+	background-color: rgba(35, 35, 35, 0.75);
+	color: #fff;
+	border-radius: 2px;
+	padding: 2px;
+}
+.vid{
+	display: inline-block;
+	//min-width: 25%;
+	width: 280pt;
+	height: 280pt;
+}
+#video{
+	position: relative;
+display: inline-block;
+}
+#video >img{
+	width: 280pt;
+	height: 180pt;
 }
 </style>
