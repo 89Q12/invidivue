@@ -3,7 +3,7 @@ import { User } from "./User";
 @Entity()
 export class Search{
     @PrimaryGeneratedColumn()id: number;
-    @Column()channelid: string;
+    @Column()query: string;
     @Column({type: "text"})cache: string;
     @UpdateDateColumn()lastloaded: Date;
 }

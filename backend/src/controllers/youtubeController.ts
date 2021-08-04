@@ -5,19 +5,41 @@ import  { Client } from "youtubei";
 import * as ytch from 'yt-channel-info';
 import * as ytdl from 'ytdl-core';
 
-import {createConnection, EntityTarget, Repository} from "typeorm";
+import {Any, createConnection, EntityTarget, In, Repository} from "typeorm";
 import { Channel } from "../entity/Channel";
 import { User } from "../entity/User";
+import { Search } from "../entity/Search";
+import { Video } from "../entity/Video";
+import { UV_FS_O_FILEMAP } from "constants";
 var connection = createConnection();
 const youtube = new Client();
 //https://www.youtube.com/watch?v=dQw4w9WgXcQ //Just youtube url 
 const getVideoById = async (req, res): Promise<Response> => {
     if(req.query["v"]){
-        const url = await ytdl.getInfo('http://www.youtube.com/watch?v='+encodeURIComponent(req.query["v"]));
-        //console.log(url);
+        const vid= encodeURIComponent(req.query["v"]);
+        
+        const conn = await connection;
+        const videos = conn.getRepository(Video);
+        const video = await videos.findOne({ytid:vid}).catch((reason:any)=>console.log(reason));
+        
+        const url = await ytdl.getInfo('http://www.youtube.com/watch?v='+vid);
+        if(video){
+            video.internalclicks++;
+            videos.save(video);
+        }else{
+            let newvideo=new Video();
+            if(url["videoDetails"]){
+                if(url["videoDetails"]["lengthSeconds"]){
+                    newvideo.seconds=Number(url["videoDetails"]["lengthSeconds"]);
+                }
+            }
+            newvideo.internalclicks=1;
+            newvideo.cache=JSON.stringify(url);
+            videos.save(newvideo);
+        }
         return res.status(200).json({
             message: 'OK',
-            url:url,
+            url:url
         });
         
     }
@@ -32,19 +54,47 @@ const getResults = async (req, res): Promise<Response> => {
         let query = "";
         if(req.query["q"])query=req.query["q"];
         if(req.query["search_query"])query=req.query["search_query"];
-    
         
-        const videos = await youtube.search(query, {
-            type: "all", // video | playlist | channel | all
-        });
+        var ONE_HOUR = 60 * 60 * 1000;
+        let reloadflag = false;
+        const conn = await connection;
+            const searches = await conn.getRepository(Search);
+        if(req.query["forcereload"]){
+            reloadflag=true;
+        }else{
+            
+            const s = await searches.findOne({query:query});
+            if(s){
+                if(((new Date()).getTime() -s.lastloaded.getTime())<ONE_HOUR){
+                    return res.status(200).json({
+                        message: 'OK',
+                        ytvideos:s.cache,
+                    });
+                }else{
+                    reloadflag=true;
+                }
+            }else{
+                reloadflag=true;
+            }
+        }
         
-        return res.status(200).json({
-            message: 'OK',
-            ytvideos:videos,
-        });
-
-        
-        
+        if(reloadflag){
+            const videos = await youtube.search(query, {
+                type: "all", // video | playlist | channel | all
+            });
+            let dbsearch = new Search();
+            dbsearch.query=query;
+            dbsearch.cache=JSON.stringify(videos);
+            return res.status(200).json({
+                message: 'OK',
+                ytvideos:videos,
+            });
+            await searches.save(dbsearch);
+        }else{
+            return res.status(400).json({
+                message: 'not implemented',
+            });
+        }
     }
     
     return res.status(400).json({
@@ -97,16 +147,36 @@ const getvideos = async (channelId:string,sortBy:string) => {
 const getnewestvideos = async (channelId:string) => {
     return await getvideos(channelId,'newest');
 };
+const getnewestvideoscached = async (channelid:string) => {
+    const conn = await connection;
+    const channels = conn.getRepository(Channel);
+    let dbchan = await channels.findOne({channelid:channelid});
+    if(dbchan){
+    }else{
+        getcachedchannel(channelid);
+        dbchan = await channels.findOne({channelid:channelid});
+    }
+    if(dbchan){
+        if((new Date()).getTime()- dbchan.lastloaded.getTime()>(1000*60*60) || dbchan.newestcache==""){
+            const newest = await getnewestvideos(dbchan.channelid);
+            dbchan.newestcache=JSON.stringify(newest);
+            channels.save(dbchan);
+        }else{
+            return JSON.parse(dbchan.newestcache);
+        }
+        
+    }else{
+        return null;
+    }
+};
 const getChannel = async (req, res): Promise<Response> => {
     if(req.params["cid"]){
         const channel = await getcachedchannel(req.params["cid"])
-        const videos = await getnewestvideos(channel.authorId);
         channel.dbchannel = {};
-        console.log(videos);
         return res.status(200).json({
             message: 'OK',
             channel:channel,
-            videos:videos,
+
         });
     }
     return res.status(400).json({
@@ -316,4 +386,107 @@ const uploadnewpipesubs = async (req, res): Promise<Response> => {
 		message: 'not implemented',
 	});
 };
-export default { getVideoById,getResults,getChannel,subscribe,unsubscribe,getSubscriptions,uploadnewpipesubs };
+const addvideo=async()=>{
+
+}
+const texttomillis=(e,y)=>{
+    if(e=="hours"||e=="hour"){
+        return 1000*60*60;
+    }
+    else if(e=="days"||e=="day"){
+        return 1000*60*60*24;
+    }
+    else if(e=="months"||e=="month"){
+        return 1000*60*60*24*30;
+    }
+    else if(e=="weeks"||e=="week"){
+        return 1000*60*60*24*7;
+    }
+    else if(e=="years"||e=="year"){
+        return 1000*60*60*24*365;
+    }
+    else if(e=="minutes"||e=="minute"){
+        return 1000*60;
+    }
+    else{
+        console.log("not found:''"+e+"''"+y+"''");
+    }
+    return 0;
+};
+const publishedtexttomillis=(text)=>{
+    const splitted= text.split(" ");
+    if(splitted[0]!="Streamed"){
+        return(Number(splitted[0])*texttomillis(splitted[1],splitted));
+    }else{
+        return(Number(splitted[1])*texttomillis(splitted[2],splitted));
+    }
+}
+const getFeed = async (req, res): Promise<Response> => {
+    if(req.user){
+        const conn = await connection;
+        const users = conn.getRepository(User);
+        const channels = conn.getRepository(Channel);
+        const user = await users.findOne(req.user,{ relations: ["subscriptions"] });
+        let out = [];
+        const subs = user.subscriptions;
+        const videos = conn.getRepository(Video);
+        let chids=[];
+        let newvids=[];
+        for (let index = 0; index < subs.length; index++) {
+            console.log(index +" / "+ subs.length);
+            const channel = subs[index];
+            const newest = await getnewestvideoscached(channel.channelid);
+            chids.push(channel.id);
+            if(newest){
+                if(newest["items"]){
+                    const items = newest["items"]
+                    
+                   
+                    for (let i = 0; i < items.length; i++) {
+                        const item = items[i];
+                        
+                        if(item["videoId"]){
+                            const videoId = item["videoId"];
+                            const video = await videos.findOne({ytid:videoId});
+                            if(video){
+                                //console.log("indb");
+                                break;
+                            }else{
+                                const newvideo = new Video();
+                                newvideo.ytid=videoId;
+                                newvideo.channel=channel;
+                                //newvids.push(item);
+                                if(item["lengthSeconds"]){
+                                    newvideo.seconds=item["lengthSeconds"];
+                                }
+                                if(item["publishedText"]){
+                                    //console.log(item["publishedText"]);
+                                    newvideo.guesseddate=new Date((new Date()).getTime()-publishedtexttomillis(item["publishedText"]));
+                                }
+                                newvideo.cache=JSON.stringify(item);
+                                videos.save(newvideo);
+                                
+                            }
+                        }
+                    }
+                }
+            }
+            
+        }
+        
+        const q= await videos.createQueryBuilder("videos").where("channelId IN(:...ids)", { ids: chids }).orderBy('guesseddate', 'DESC').limit(100).getMany();
+        return res.status(200).json({
+            message: 'OK',
+            feed: q
+        });
+        //videos.createQueryBuilder("video").where("channel.id IN (:chids)",{chids:chids}).orderBy("  ")
+    }else{
+        return res.status(400).json({
+            message: 'not logged in',
+        });
+    }
+    return res.status(400).json({
+		message: 'not implemented',
+	});
+}
+export default { getVideoById,getResults,getChannel,subscribe,unsubscribe,getSubscriptions,uploadnewpipesubs,getFeed };

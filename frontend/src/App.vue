@@ -57,4 +57,12 @@ display: inline-block;
 	width: 280pt;
 	height: 180pt;
 }
+video {
+	width: -moz-available;
+	width: -webkit-fill-available;
+}
+.videoInfo{
+	//height: 500pt; switch with js to hide info
+overflow: hidden;
+}
 </style>

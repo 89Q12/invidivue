@@ -18,7 +18,7 @@ export class User {
     @ManyToMany(type => Group, group=>group.id)
     groups: Group[];
 
-    @JoinTable()
+    
     @ManyToMany(type => Watch, watch => watch.id)
     watch: Watch[];
 }
