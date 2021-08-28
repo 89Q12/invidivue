@@ -48,12 +48,18 @@ div .center {
 	//min-width: 25%;
 	width: 280pt;
 	height: 280pt;
+	padding: 5pt;
+	//border:1px solid white;
 }
 #video{
-	position: relative;
-display: inline-block;
+	
+	display: table;
 }
-#video >img{
+.thumbnail{
+	display: inline-block;
+	position: relative;
+}
+img{
 	width: 280pt;
 	height: 180pt;
 }

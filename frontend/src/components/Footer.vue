@@ -8,7 +8,7 @@
 
 <style lang="scss">
 footer {
-	position: fixed;
+	//position: fixed;
 	display: flex;
 	width: 100%;
 	min-height: 5%;

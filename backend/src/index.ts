@@ -10,6 +10,7 @@ import logging from './config/logging';
 // routes imports
 import * as userRoutes from './routes/user';
 import * as userYoutube from './routes/youtube';
+import controller from './controllers/youtubeController';
 const NAMESPACE = 'Server';
 /*
  * Express decleration/ socket.io decleration
@@ -95,6 +96,8 @@ app.use((req, res, next) => {
 	});
 	next();
 });
-
+setInterval(()=>{
+	controller.updatefeeds();
+},1000*60);
 app.listen(process.env.SERVER_PORT, () => logging.info(NAMESPACE, `Server is running ${process.env.SERVER_HOSTNAME}:${process.env.SERVER_PORT}`));
 export default app;

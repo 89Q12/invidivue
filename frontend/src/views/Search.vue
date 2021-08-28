@@ -2,13 +2,15 @@
 	<div class="results">
 		<div v-for="video in results" v-bind:key="video" class="vid">
 			<a @click="watchWithId(video.id)">
-				<div id="video">
+			<div id="video">
+				<div class="thumbnail">
 				<img :src="video.thumbnails[0].url" :height="video.thumbnails[0].height" :width="video.thumbnails[0].width" />
 				<p id="duration">{{ video.duration / 100 }} Min</p>
 				</div>
-			<p>{{ video.title }}</p>
-			<p>{{ video.channel?video.channel.name:"" }}</p>
-			<p>{{ video.uploadDate }} {{ video.viewCount / 1000 }}K</p>
+				<p>{{ video.title }}</p>
+				<p>{{ video.channel?video.channel.name:"" }}</p>
+				<p>{{ video.uploadDate }} {{ video.viewCount / 1000 }}K</p>
+			</div>
 			</a>
 		</div>
 	</div>

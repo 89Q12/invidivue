@@ -23,6 +23,7 @@ const getVideoById = async (req, res): Promise<Response> => {
         const video = await videos.findOne({ytid:vid}).catch((reason:any)=>console.log(reason));
         
         const url = await ytdl.getInfo('http://www.youtube.com/watch?v='+vid);
+        
         if(video){
             video.internalclicks++;
             videos.save(video);
@@ -322,11 +323,12 @@ const getSubscriptions = async (req, res): Promise<Response> => {
     if(req.user){
         const conn = await connection;
         const users = conn.getRepository(User);
-        const user = await users.findOne(req.user);
+        const user = await users.findOne(req.user,{ relations: ["subscriptions"] });
+        
         if(user){
             return res.status(200).json({
                 message: 'OK',
-                subscribtions:user.subscriptions
+                subscriptions:user.subscriptions
             });
         }
     }else{
@@ -415,33 +417,24 @@ const texttomillis=(e,y)=>{
 };
 const publishedtexttomillis=(text)=>{
     const splitted= text.split(" ");
+    if(splitted[0]!="Live"){
+        return 0;
+    }
     if(splitted[0]!="Streamed"){
         return(Number(splitted[0])*texttomillis(splitted[1],splitted));
     }else{
         return(Number(splitted[1])*texttomillis(splitted[2],splitted));
     }
 }
-const getFeed = async (req, res): Promise<Response> => {
-    if(req.user){
-        const conn = await connection;
-        const users = conn.getRepository(User);
-        const channels = conn.getRepository(Channel);
-        const user = await users.findOne(req.user,{ relations: ["subscriptions"] });
-        let out = [];
-        const subs = user.subscriptions;
-        const videos = conn.getRepository(Video);
-        let chids=[];
-        let newvids=[];
-        for (let index = 0; index < subs.length; index++) {
-            console.log(index +" / "+ subs.length);
-            const channel = subs[index];
-            const newest = await getnewestvideoscached(channel.channelid);
-            chids.push(channel.id);
+
+const updateChannel= async (channel)=>{
+    const conn = await connection;
+    const videos = conn.getRepository(Video);
+    const newest = await getnewestvideoscached(channel.channelid);
+            
             if(newest){
                 if(newest["items"]){
                     const items = newest["items"]
-                    
-                   
                     for (let i = 0; i < items.length; i++) {
                         const item = items[i];
                         
@@ -471,10 +464,45 @@ const getFeed = async (req, res): Promise<Response> => {
                     }
                 }
             }
-            
+}
+const updatefeeds= async()=>{
+    const conn = await connection;
+    const channels = conn.getRepository(Channel);
+    const count = await channels.createQueryBuilder().getCount();
+    const pagesize= 50;
+    for (let i = 0; i < count; i+=pagesize) {
+        const query = await channels.createQueryBuilder().limit(pagesize).skip(i).getMany();
+        for (let x = 0; x < query.length; x++) {
+            const element = query[x];
+            updateChannel(element);
+            console.log((i+x) +" / "+ count);
+        }
+    }
+};
+const getFeed = async (req, res): Promise<Response> => {
+    if(req.user){
+        const conn = await connection;
+        const users = conn.getRepository(User);
+        const channels = conn.getRepository(Channel);
+        const user = await users.findOne(req.user,{ relations: ["subscriptions"] });
+        let out = [];
+        const subs = user.subscriptions;
+        const videos = conn.getRepository(Video);
+        let chids=[];
+        let newvids=[];
+        for (let index = 0; index < subs.length; index++) {
+            console.log(index +" / "+ subs.length);
+            const channel = subs[index];
+            chids.push(channel.id);
+            updateChannel(channel);
         }
         
-        const q= await videos.createQueryBuilder("videos").where("channelId IN(:...ids)", { ids: chids }).orderBy('guesseddate', 'DESC').limit(100).getMany();
+        const q= await videos.createQueryBuilder("video")
+        .select("video.ytid, video.seconds, video.internalclicks, video.cache, video.guesseddate")
+        .where("channelId IN(:...ids)", { ids: chids })
+        .orderBy('guesseddate', 'DESC')
+        .limit(100)
+        .getRawMany();
         return res.status(200).json({
             message: 'OK',
             feed: q
@@ -489,4 +517,5 @@ const getFeed = async (req, res): Promise<Response> => {
 		message: 'not implemented',
 	});
 }
-export default { getVideoById,getResults,getChannel,subscribe,unsubscribe,getSubscriptions,uploadnewpipesubs,getFeed };
+
+export default { getVideoById,getResults,getChannel,subscribe,unsubscribe,getSubscriptions,uploadnewpipesubs,getFeed,updatefeeds };
