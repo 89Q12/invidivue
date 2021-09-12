@@ -7,6 +7,7 @@ export const video_store_module = {
 		current_video: {},
 		channel: {},
 		search_results: [],
+		search_query:"",
 		errors: [] as AxiosError[],
 	}),
 	mutations: {
@@ -21,6 +22,9 @@ export const video_store_module = {
 		},
 		set_channel(state: any, channel: Record<string, unknown>) {
 			state.channel = channel;
+		},
+		set_search_query(state: any, query: Record<string, unknown>) {
+			state.search_query = query;
 		},
 		set_search_result(state: any, result: Array<Record<string, unknown>>) {
 			state.search_results = result;
@@ -64,6 +68,7 @@ export const video_store_module = {
 		},
 		async get_search_result(context: any, search_query: string) {
 			try {
+				context.commit('set_search_query', search_query);
 				const response: AxiosResponse = await axios.get(url + '/results?q=' + search_query);
 				context.commit('set_search_result', response.data.ytvideos);
 			} catch (err: any) {

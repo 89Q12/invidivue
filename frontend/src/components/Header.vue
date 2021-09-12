@@ -22,23 +22,35 @@
 import { ref } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
+		
+		
 export default {
 	setup() {
 		const searchParams = ref<string>('');
 		const store = useStore();
-		const router = useRouter();
+		const router = useRouter();	
+		store.subscribe((mutation, state) => {
+			if(mutation.type == "set_search_query"){
+				searchParams.value=mutation.payload;
+			}
+		})
+		//const fun = (e:any)=>{console.log(JSON.stringify(e))};
+		//store.watch(fun,(val,old)=>{console.log(val);console.log(old);})
 		async function search() {
 			if (searchParams.value != '') {
 				await store.dispatch('get_search_result', searchParams.value);
-				router.push('search');
+				//router.push({ path: 'search', params: {  searchParams } });
+				router.push({ path: 'search', query: { query: searchParams.value } })
 			}
 		}
+		
 		return {
 			searchParams,
 			store,
 			search,
 		};
 	},
+	
 };
 </script>
 
