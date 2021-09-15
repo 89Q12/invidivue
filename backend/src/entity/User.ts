@@ -7,7 +7,7 @@ export class User {
     @PrimaryGeneratedColumn()id: number;
     @Column()name: string;
     @Column()password: string;
-    @Column()token: string;
+    @Column({nullable: true})token: string;
     @Column({nullable: true})created: Date;
 
     @JoinTable()

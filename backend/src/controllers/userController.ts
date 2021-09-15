@@ -4,11 +4,13 @@ import { hash, compare } from 'bcrypt';
 //import User from '../models/user';
 import {User} from '../entity/User';
 import {Group} from '../entity/Group'
+import {Captcha} from '../entity/Captcha'
 import {RefreshToken} from '../entity/RefreshToken';
 import signJWT from '../utils/signJTW';
 import logging from '../config/logging'
 import {createConnection, EntityTarget, Repository} from "typeorm";
 import * as RToken from '../models/refreshToken';
+import { createCanvas, loadImage } from 'canvas';
 var connection = createConnection();
 connection.then(async conn=>{
 	const groups = conn.manager.getRepository(Group);
@@ -36,28 +38,50 @@ connection.then(async conn=>{
 		user.name=process.env.SERVER_ADMIN_NAME;
 		user.password=await hash(process.env.SERVER_ADMIN_PASSWORD,1);
 		user.groups=[group_admin,group_user];
+		user.token="";
 		conn.manager.save(user);
 	}
 	
 });
 // Register Funktion
 const register = async (req: Request, res: Response): Promise<Response> => {
-	const { username, password} = req.body;
+	const { username, password,captchatext,captchaid} = req.body;
 	const conn = await connection;
 	const users = await conn.manager.getRepository(User);
 	const name = await users.findOne({name:username});
+	const captchas = await conn.manager.getRepository(Captcha);
 	if(name){
 		return res.status(400).json({
 			message: 'user already exists!',
 		});
 	}else{
-		const user = new User();
-		user.name=username;
-		user.password=await hash(password,1);
-		conn.manager.save(user);
-		return res.status(200).json({
-			message: 'succesfully added user',
-		});
+		const captcha = await captchas.findOne({id:captchaid});
+		if(captcha){
+			const splitted = captchatext.split(",")
+			const vx = Number(splitted[0])-captcha.x
+			const vy = Number(splitted[1])-captcha.y
+			if(Math.sqrt(vx*vx+vy*vy)<10.0){
+				captchas.delete(captcha);
+				const user = new User();
+				user.name=username;
+				user.password=await hash(password,1);
+				conn.manager.save(user);
+				return res.status(200).json({
+					message: 'succesfully added user',
+				});
+			}else{
+				console.log("failed captcha")
+				return res.status(401).json({
+					message: 'failed',
+				});
+			}
+		}else{
+			console.log("captcha not found")
+			return res.status(401).json({
+				message: 'failed',
+			});
+		}
+		
 	}
 	
 	return res.status(400).json({
@@ -365,6 +389,59 @@ const allUsers = async (req: Request, res: Response): Promise<any> => {
 		);*/
 };
 
+const getcaptcha = async (req: Request, res: Response): Promise<any> => {
+	const conn = await connection;
+	//console.log(req.user);
+	const r = 10;
+	const w = 220;
+	const h = 120;
+	const canvas = createCanvas(w, h)
+	const ctx = canvas.getContext('2d')
+	const captchas = await conn.manager.getRepository(Captcha);
+	const captcha = new Captcha();
+	
+	ctx.beginPath();
+	ctx.rect(0, 0, w, h);
+	ctx.fillStyle = "black";
+	ctx.fill();
+	ctx.lineWidth = Math.random()*4+1;
+	ctx.strokeStyle = 
+	"rgba("
+	+Math.round(Math.random()*255.0)+", "
+	+Math.round(Math.random()*255.0)+", "
+	+Math.round(Math.random()*255.0)+", "
+	+(Math.random()*0.5+0.5)+")";
+	ctx.beginPath();
+	const astart = 2.0 * Math.PI;
+	const halfr = r/2.0;
+	const px = Math.random()*(w-r*2)+r;
+	const py = Math.random()*(h-r*2)+r;
+	captcha.x=px;
+	captcha.y=py;
+	captcha.text=px+","+py;
+	console.log(px+" "+py)
+	ctx.arc(px, py, r, astart, astart+1.75 * Math.PI);
+	ctx.stroke();
+	for (let x = 0; x < 20; x++) {
+		ctx.beginPath();
+		ctx.lineWidth = Math.random()*4+1;
+		ctx.strokeStyle = "rgba("+Math.round(Math.random()*255.0)+", "+Math.round(Math.random()*255.0)+", "+Math.round(Math.random()*255.0)+", "+Math.random()+")";
+		ctx.arc(Math.random()*w, Math.random()*h, r+(Math.random()*12.0), 0.0, 2.0 * Math.PI);
+		ctx.stroke();
+	}
+	
+	captcha.image=canvas.toDataURL();
+	captcha.id= (await captchas.save(captcha)).id;
+	console.log(captcha.id)
+	return res.status(200).json({
+		message: 'OK',
+		captcha:captcha.image,
+		captchaid:captcha.id
+	});
+	return res.status(400).json({
+		message: 'not implemented',
+	});
+};
 const changeName = async (req: Request, res: Response): Promise<void> => {
 	const { username } = req.body;
 	const ID = { _id: req.params.userId };
@@ -411,4 +488,16 @@ const changePassword = async (req: Request, res: Response): Promise<void> => {
 			);*/
 	});
 };
-export default { register, login, findUser, updateUser, logout, getUser, refreshToken, allUsers, changeName, changePassword };
+export default { 
+	register, 
+	login, 
+	findUser, 
+	updateUser, 
+	logout, 
+	getUser, 
+	refreshToken, 
+	allUsers, 
+	changeName, 
+	changePassword,
+	getcaptcha
+};

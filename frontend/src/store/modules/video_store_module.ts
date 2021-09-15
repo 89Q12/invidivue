@@ -8,6 +8,7 @@ export const video_store_module = {
 		channel: {},
 		search_results: [],
 		search_query:"",
+		username:"",
 		errors: [] as AxiosError[],
 	}),
 	mutations: {
@@ -31,6 +32,9 @@ export const video_store_module = {
 		},
 		set_error(state: any, error: AxiosError) {
 			state.errors.push(error);
+		},
+		set_username(state: any, username: Record<string, unknown>) {
+			state.username=username;
 		},
 	},
 	actions: {
@@ -75,5 +79,8 @@ export const video_store_module = {
 				context.commit('set_error', err);
 			}
 		},
+		async set_username(context: any, username: string) {
+			context.commit('set_username', username);
+		}
 	},
 };

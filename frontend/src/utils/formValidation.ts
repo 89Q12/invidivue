@@ -2,9 +2,8 @@ import * as yup from 'yup';
 
 const UserRegisterSchema = yup.object({
 	username: yup.string().required(),
-	email: yup.string().email().required(),
 	password: yup.string().min(8).max(16).required(),
-	admin: yup.boolean().default(false).required(),
+	captcha: yup.string().min(1).max(16).required(),
 });
 
 const UserLoginSchema = yup.object({
@@ -17,7 +16,7 @@ const UserChangeNameSchema = yup.object({
 });
 
 const UserChangePasswordSchema = yup.object({
-	password: yup.string().required(),
+	password: yup.string().min(1).max(16).required(),
 });
 
 export { UserRegisterSchema, UserLoginSchema, UserChangePasswordSchema, UserChangeNameSchema };

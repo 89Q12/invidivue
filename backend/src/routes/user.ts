@@ -17,4 +17,5 @@ router.post(
 	validation(UserChangePasswordSchema),
 	controller.changePassword,
 );
+router.get('/getcaptcha',controller.getcaptcha)
 export { router };

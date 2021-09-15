@@ -1,24 +1,22 @@
 <template>
 	<div class="center">
-		<form class="loginForm">
-			<fieldset>
-				<label>Username</label>
-				<input type="text" v-model="form.username" required />
-				<label>Password</label>
-				<input type="password" v-model="form.password" />
-				<div v-if="Errors.length">
-					<div>
-						<ul>
-							<li v-for="error in Errors" :key="error">{{ error }}</li>
-						</ul>
-					</div>
-				</div>
+		<div class="form">
+			<label>Username</label>
+			<input type="text" v-model="form.username" required />
+			<label>Password</label>
+			<input type="password" v-model="form.password" @keyup.enter="submitForm" />
+			<div v-if="Errors.length">
 				<div>
-					<router-link to="/signup">Create an account</router-link>
+					<ul>
+						<li v-for="error in Errors" :key="error">{{ error }}</li>
+					</ul>
 				</div>
-				<button type="submit" @click="submitForm">Login</button>
-			</fieldset>
-		</form>
+			</div>
+			<div>
+				<router-link to="/signup">Create an account</router-link>
+			</div>
+			<button @click="submitForm">Login</button>
+		</div>
 	</div>
 </template>
 
@@ -48,12 +46,17 @@ export default {
 				return;
 			}
 			await axios
-				.post('http://localhost:5000/api/users/login', form, { withCredentials: true })
+				.post('http://localhost:5000/api/user/login', form, { withCredentials: false })
 				.then((res: AxiosResponse) => {
 					localStorage.setItem('loggedIn', 'true');
+					localStorage.setItem('username', form.username);
+					store.dispatch('set_username', form.username);
+					console.log("succes login");
 					router.push('/');
 				})
 				.catch((error: AxiosError) => {
+					console.log("login failed"+error);
+					localStorage.setItem('loggedIn', 'false');
 					Errors.push(error.response?.data.message);
 				});
 		}
@@ -67,32 +70,5 @@ export default {
 };
 </script>
 <style lang="scss">
-.loginForm {
-	color: #ffffff;
-	word-wrap: break-word;
-}
-.loginForm fieldset input {
-	padding: 0.5em 0.6em;
-	margin-top: 0.5em;
-	margin-bottom: 0.5em;
-	border-radius: 4px;
-	width: 100%;
-	height: 50%;
-}
-.loginForm fieldset input:focus {
-	outline: none;
-}
-.loginForm fieldset {
-	border: none;
-}
-button {
-	font-size: 100%;
-	margin-top: 0.5em;
-	padding: 0.5em 1em;
-	background-color: #a0a0a0;
-	box-shadow: none;
-	border: none;
-	border-radius: 4px;
-	cursor: pointer;
-}
+
 </style>

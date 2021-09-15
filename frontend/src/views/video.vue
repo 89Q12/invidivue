@@ -31,6 +31,9 @@ export default {
 	setup() {
 		const store = useStore();
 		const router = useRouter();
+		if(router.currentRoute.value.query.id){
+			store.dispatch('get_current_video', router.currentRoute.value.query.id);
+		}
 		onMounted(() => {
 			console.log(localStorage.getItem('current_video'));
 			if (localStorage.getItem('current_video')) {

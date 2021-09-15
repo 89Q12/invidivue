@@ -8,7 +8,6 @@ import Header from './components/Header.vue';
 import Footer from './components/Footer.vue';
 export default {
 	name: 'App',
-
 	components: {
 		Header,
 		Footer,
@@ -59,7 +58,11 @@ div .center {
 	display: inline-block;
 	position: relative;
 }
-img{
+.channelpicture{
+	display: table;
+	position: relative;
+}
+img.thumbnail{
 	width: 280pt;
 	height: 180pt;
 }
@@ -70,5 +73,37 @@ video {
 .videoInfo{
 	//height: 500pt; switch with js to hide info
 overflow: hidden;
+}
+.form {
+	margin-top: 2.5em;
+	color: #ffffff;
+	word-wrap: break-word;
+}
+.form input {
+	padding: 0.5em 0.6em;
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+	border-radius: 4px;
+	width: 100%;
+	height: 50%;
+}
+.form input:focus {
+	outline: none;
+}
+.form {
+	border: none;
+}
+.form button {
+	font-size: 100%;
+	margin-top: 0.5em;
+	padding: 0.5em 1em;
+	background-color: #a0a0a0;
+	box-shadow: none;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+}
+.error{
+	color:lightcoral;
 }
 </style>

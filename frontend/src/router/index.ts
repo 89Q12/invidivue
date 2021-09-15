@@ -16,6 +16,14 @@ const routes: Array<RouteRecordRaw> = [
 		component: () => import(/* webpackChunkName: "signin" */ '../views/signin.vue'),
 	},
 	{
+		path: '/signup',
+		name: 'Signup',
+		// route level code-splitting
+		// this generates a separate chunk (signin.[hash].js) for this route
+		// which is lazy-loaded when the route is visited.
+		component: () => import(/* webpackChunkName: "signin" */ '../views/signup.vue'),
+	},
+	{
 		path: '/search',
 		name: 'Search',
 		
@@ -31,6 +39,14 @@ const routes: Array<RouteRecordRaw> = [
 		// this generates a separate chunk (search.[hash].js) for this route
 		// which is lazy-loaded when the route is visited.
 		component: () => import(/* webpackChunkName: "video" */ '../views/video.vue'),
+	},
+	{
+		path: '/channel',
+		name: 'channel',
+		// route level code-splitting
+		// this generates a separate chunk (search.[hash].js) for this route
+		// which is lazy-loaded when the route is visited.
+		component: () => import(/* webpackChunkName: "video" */ '../views/channel.vue'),
 	},
 ];
 

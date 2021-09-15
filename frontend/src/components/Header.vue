@@ -11,7 +11,8 @@
 				<router-link to="/" class="menu-item-top" @click="store.dispatch('logout')">Logout</router-link>
 			</div>
 			<div class="end">
-				<router-link to="/signin" class="menu-item-top">Login</router-link>
+				<router-link v-if="loggedIn=='false'" to="/signin" class="menu-item-top">Login</router-link>
+				<router-link v-if="loggedIn=='true'" to="/profile" class="menu-item-top">{{username}}</router-link>
 				
 			</div>
 		</nav>
@@ -27,26 +28,35 @@ import { useRouter } from 'vue-router';
 export default {
 	setup() {
 		const searchParams = ref<string>('');
+		const username = ref<string>('');
 		const store = useStore();
 		const router = useRouter();	
+		const storeusername = localStorage.getItem('username');
+		if (storeusername!=null){
+			console.log(storeusername)
+		username.value=storeusername;
+		}
 		store.subscribe((mutation, state) => {
 			if(mutation.type == "set_search_query"){
 				searchParams.value=mutation.payload;
 			}
+			if(mutation.type == 'set_username'){
+				username.value=mutation.payload;
+			}
 		})
-		//const fun = (e:any)=>{console.log(JSON.stringify(e))};
-		//store.watch(fun,(val,old)=>{console.log(val);console.log(old);})
 		async function search() {
 			if (searchParams.value != '') {
 				await store.dispatch('get_search_result', searchParams.value);
-				//router.push({ path: 'search', params: {  searchParams } });
 				router.push({ path: 'search', query: { query: searchParams.value } })
 			}
 		}
+		const loggedIn= localStorage.getItem('loggedIn');
 		
 		return {
 			searchParams,
 			store,
+			loggedIn,
+			username,
 			search,
 		};
 	},
@@ -60,7 +70,7 @@ header {
 	width: 100%;
 	height: 5em;
 	z-index: 999;
-
+	display: inline;
 	.o-switch__label {
 		color: #000000;
 	}
