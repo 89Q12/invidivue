@@ -280,7 +280,7 @@ const getcaptcha = async (req: Request, res: Response): Promise<any> => {
 		ctx.stroke();
 	}
 	
-	captcha.image=canvas.toDataURL();
+	captcha.image=canvas.toDataURL('image/jpeg', 0.9);
 	captcha.id= (await captchas.save(captcha)).id;
 	console.log(captcha.id)
 	return res.status(200).json({
