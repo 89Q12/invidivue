@@ -1,6 +1,5 @@
 import * as express from 'express';
 import * as cookieParser from 'cookie-parser';
-import * as mongoose from 'mongoose';
 import * as cors from 'cors';
 import * as passport from 'passport';
 // midlleware imports
@@ -12,34 +11,8 @@ import * as userRoutes from './routes/user';
 import * as userYoutube from './routes/youtube';
 import controller from './controllers/youtubeController';
 const NAMESPACE = 'Server';
-/*
- * Express decleration/ socket.io decleration
- */
+
 const app = express();
-
-/*
- * Verbindung mit der Datenbank aufbauen
- */
-/*const url = `mongodb://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@${process.env.MONGO_HOST}`;
-
-const opts = {
-	useUnifiedTopology: true,
-	useNewUrlParser: true,
-	socketTimeoutMS: 30000,
-	keepAlive: true,
-	poolSize: 50,
-	autoIndex: false,
-	retryWrites: true,
-	useFindAndModify: false,
-};
-mongoose
-	.connect(url, opts)
-	.then((result) => {
-		logging.info(NAMESPACE, 'Deine Mongo ist Connected', result);
-	})
-	.catch((error) => {
-		logging.error(NAMESPACE, error.message, error);
-	});*/
 
 /**
  * Log the request
