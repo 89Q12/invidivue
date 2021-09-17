@@ -1,7 +1,7 @@
 <template>
-	<Header />
-	<router-view />
-	<Footer />
+		<Header />
+		<router-view />
+		<Footer />
 </template>
 <script lang="ts">
 import Header from './components/Header.vue';
@@ -60,7 +60,7 @@ div .center {
 }
 .channelpicture{
 	display: table;
-	position: relative;
+	width: 100%;
 }
 img.thumbnail{
 	width: 280pt;
