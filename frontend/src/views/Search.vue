@@ -1,31 +1,27 @@
 <template>
-	<div class="results">
-		<div v-for="video in results" v-bind:key="video" class="vid">
+	<div class="row mx-auto">
+		<div class="col-12 mt-4"></div>
+		<div v-for="video in results" v-bind:key="video" class="col-sm-4">
 			<div v-if="video.name">
-				
 				<div class="channelpicture">
-					<a @click="gotochannel(video.id)">
-				<img :src="video.thumbnails[video.thumbnails.length-1].url" :height="video.thumbnails[video.thumbnails.length-1].height" :width="video.thumbnails[video.thumbnails.length-1].width" />
-				<p>{{ video.name }}</p>
-				<p>{{ video.videoCount }} videos</p>
-				<p>{{ video.subscriberCount }}Subscribers</p>
-				
-				</a>
+					<div class="d-flex justify-content-center">
+						<img class="img-thumbnail w-50" :src="video.thumbnails[0].url" />
+					</div>
+						<a @click="gotochannel(video.id)" ><p>{{ video.name }}</p></a>
+						<p>{{ video.videoCount }} videos</p>
+						<p>{{ video.subscriberCount }}Subscribers</p>
 				</div>
-				
 			</div>
 			<div v-else>
-			<a @click="watchWithId(video.id)">
-			<div id="video">
-				<div class="thumbnail">
-				<img class="thumbnail" :src="video.thumbnails[0].url" :height="video.thumbnails[0].height" :width="video.thumbnails[0].width" />
-				<p id="duration">{{ video.duration / 100 }} Min</p>
+				<div id="video">
+					<div class="thumbnail">
+						<img class="thumbnail" :src="video.thumbnails[0].url" width="100%" />
+						<p id="duration">{{ video.duration / 100 }} Min</p>
+					</div>
+					<a @click="watchWithId(video.id)" ><p>{{ video.title }}</p></a>
+					<p>{{ video.channel?video.channel.name:"" }} </p>
+					<p>{{ video.uploadDate }} {{ video.viewCount / 1000 }}K</p>
 				</div>
-				<p>{{ video.title }}</p>
-				<p>{{ video.channel?video.channel.name:"" }}</p>
-				<p>{{ video.uploadDate }} {{ video.viewCount / 1000 }}K</p>
-			</div>
-			</a>
 			</div>
 		</div>
 	</div>
@@ -35,7 +31,6 @@
 import { ref, computed } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
-import Header from '../components/Header.vue';
 export default {
 	
 	setup() {
