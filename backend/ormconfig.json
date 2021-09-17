@@ -6,7 +6,7 @@
    "password": "",
    "_database": "test",
    "database": "db.sqlite",
-   "synchronize":false,
+   "synchronize":true,
    "logging": false,
    "entities": [
       "src/entity/**/*.ts"

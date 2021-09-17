@@ -48,6 +48,16 @@ const routes: Array<RouteRecordRaw> = [
 		// which is lazy-loaded when the route is visited.
 		component: () => import(/* webpackChunkName: "video" */ '../views/channel.vue'),
 	},
+	{
+		path: '/profile',
+		name: 'profile',
+		component: () => import('../views/profile.vue'),
+	},
+	{
+		path: '/subscriptions',
+		name: 'subscriptions',
+		component: () => import('../views/subscriptions.vue'),
+	},
 ];
 
 const router = createRouter({

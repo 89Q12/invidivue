@@ -48,10 +48,13 @@ export default {
 			await axios
 				.post('http://localhost:5000/api/user/login', form, { withCredentials: false })
 				.then((res: AxiosResponse) => {
+					console.log(res.data);
 					localStorage.setItem('loggedIn', 'true');
 					localStorage.setItem('username', form.username);
 					store.dispatch('set_username', form.username);
-					console.log("succes login");
+					localStorage.setItem('token', res.data.accesstoken );
+
+					
 					router.push('/');
 				})
 				.catch((error: AxiosError) => {
