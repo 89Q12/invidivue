@@ -6,10 +6,14 @@
 				<div class="channelpicture">
 					<div class="d-flex justify-content-center">
 						<img class="img-thumbnail w-50" :src="video.thumbnails[0].url" />
+						
 					</div>
+					<p><SubscribeButton :cid="video.id" /></p>
 						<a @click="gotochannel(video.id)" ><p>{{ video.name }}</p></a>
 						<p>{{ video.videoCount }} videos</p>
 						<p>{{ video.subscriberCount }}Subscribers</p>
+						
+            			
 				</div>
 			</div>
 			<div v-else>
@@ -31,8 +35,11 @@
 import { ref, computed } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
+import SubscribeButton from '../components/SubscribeButton.vue';
 export default {
-	
+	components: {
+		SubscribeButton,
+	},
 	setup() {
 		const store = useStore();
 		const router = useRouter();

@@ -21,7 +21,7 @@ export default {
                 axios.get('http://localhost:5000/ay/subscribe?cid='+props.cid,{headers: {'Authorization': "Bearer "+localStorage.getItem('token')}})
                 .then((res: AxiosResponse) => {
                     console.log(res.data)
-                    if(res.data.message=="OK"){
+                    if(res.data.message=="OK"||res.data.message=="already subscribed"){
                         buttontext.value="Unsubscribe"
                     }
                 })

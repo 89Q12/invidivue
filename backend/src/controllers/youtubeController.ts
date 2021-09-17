@@ -286,7 +286,13 @@ const unsubscribe = async (req, res): Promise<Response> => {
                     let flag = false;
                     console.log(dbchan.id);
                     const newsubs = user.subscriptions.filter(channel=>{
-                            return channel.id !== dbchan.id
+                            if(channel.id !== dbchan.id){
+                                
+                                return true;
+                            }else{
+                                flag = true;
+                                return false;
+                            }
                     });
                     user.subscriptions=newsubs;
                     users.save(user);
