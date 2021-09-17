@@ -1,5 +1,5 @@
 <template>
-	<header class="container">
+	<header class="mx-auto mt-auto">
 		<div class="navbar row">
 			<div class="col-4">
 				<router-link to="/" class="fw-bold">INVIDIVUE</router-link>
@@ -43,7 +43,7 @@ export default {
 		})
 		async function search() {
 			if (searchParams.value != '') {
-				await store.dispatch('get_search_result', searchParams.value);
+				store.dispatch('get_search_result', searchParams.value);
 				router.push({ path: 'search', query: { query: searchParams.value } })
 			}
 		}
