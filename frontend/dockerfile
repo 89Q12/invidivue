@@ -13,7 +13,7 @@ RUN npm install
 RUN npm install @vue/cli -g
 
 # start app with
-#docker run -v ${PWD}:/app -v /app/node_modules -p 8081:8080 --rm ivnidvue:dev
+#docker run -v ${PWD}:/app -v /app/node_modules -p 80:8080 --rm invidivue:dev
 # build app with
 # docker build -t ivnidvue:dev .
 CMD ["npm", "run", "serve"]
