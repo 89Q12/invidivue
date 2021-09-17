@@ -1,16 +1,13 @@
 import { Request, Response } from 'express';
-import { Types } from 'mongoose';
 import { hash, compare } from 'bcrypt';
-//import User from '../models/user';
 import {User} from '../entity/User';
 import {Group} from '../entity/Group'
 import {Captcha} from '../entity/Captcha'
 import {RefreshToken} from '../entity/RefreshToken';
 import signJWT from '../utils/signJTW';
-import logging from '../config/logging'
 import {createConnection, EntityTarget, Repository} from "typeorm";
 import * as RToken from '../models/refreshToken';
-import { createCanvas, loadImage } from 'canvas';
+import { createCanvas } from 'canvas';
 var connection = createConnection();
 connection.then(async conn=>{
 	const groups = conn.manager.getRepository(Group);
@@ -87,40 +84,6 @@ const register = async (req: Request, res: Response): Promise<Response> => {
 	return res.status(400).json({
 		message: 'not implemented',
 	});
-	/*if (resultname || resultemail) {
-		return res.status(401).json({
-			message: 'user already exists',
-		});
-	}
-	hash(password, 1, (hashError, hash) => {
-		if (hashError) {
-			return res.status(401).json({
-				message: hashError.message,
-				error: hashError,
-			});
-		}
-
-		const _user = new User({
-			_id: new Types.ObjectId(),
-			username,
-			password: hash,
-			email: email,
-			favoriten: [],
-			admin: admin,
-		});
-
-		return _user
-			.save()
-			.then(() => {
-				return res.sendStatus(201);
-			})
-			.catch((error) => {
-				return res.status(500).json({
-					message: error.message,
-					error,
-				});
-			});
-	});*/
 };
 //Login Funktion
 const login = async (req: Request, res: Response): Promise<Response> => {
@@ -129,8 +92,6 @@ const login = async (req: Request, res: Response): Promise<Response> => {
 	const users = conn.manager.getRepository(User);
 	const user = await users.findOne({name:username});
 	if(user){
-		//const hashedpassword=await hash(password,1);
-		//console.log(user.password);
 		compare(password, user.password, (error, result) => {
 			if (error ) {
 				console.log(error);
@@ -138,7 +99,6 @@ const login = async (req: Request, res: Response): Promise<Response> => {
 					message: 'Internal Server Error.',
 				});
 			} else if (result) {
-				//console.log(result);
 				signJWT(username,async (_error, token) => {
 					
 					if(_error){
@@ -172,45 +132,6 @@ const login = async (req: Request, res: Response): Promise<Response> => {
 			message: 'User not found or password wrong!',
 		});
 	}
-	
-	/*User.findOne({ username })
-		.exec()
-		.then((user) => {
-			compare(password, user.password, (error, result) => {
-				if (error || !result) {
-					return res.status(401).json({
-						message: 'Password Falsch',
-					});
-				} else if (result) {
-					signJWT(user, async (_error, token) => {
-						if (_error) {
-							return res.status(500).json({
-								message: _error.message,
-								error: _error,
-							});
-						} else if (token) {
-							await RefreshToken.findOneAndDelete({ user: user._id });
-							const refreshToken = await RefreshToken.createToken(user);
-							res.cookie('refreshToken', refreshToken, {
-								httpOnly: true,
-								secure: true,
-								signed: true,
-							});
-							return res.status(200).json({
-								message: 'Login erfolgreich',
-								accesstoken: token,
-								user: user.username,
-							});
-						}
-					});
-				}
-			});
-		})
-		.catch((err) => {
-			res.status(400).json({
-				message: 'User not found',
-			});
-		});*/
 };
 
 const refreshToken = async (req: Request, res: Response): Promise<Response> => {
@@ -234,7 +155,6 @@ const refreshToken = async (req: Request, res: Response): Promise<Response> => {
 
 		if (RToken.default.verifyExpiration(refreshToken)) {
 			res.clearCookie('refreshToken');
-			//findByIdAndRemove(refreshToken._id, { useFindAndModify: false }).exec();
 			rtokens.remove(refreshToken);
 			res.status(403).json({
 				message: 'Refresh token was expired. Please make a new signin request',
@@ -260,12 +180,11 @@ const refreshToken = async (req: Request, res: Response): Promise<Response> => {
 };
 const logout = async (req: Request, res: Response): Promise<void> => {
 	try {
-		const { refreshToken: requestToken } = req.signedCookies;
+		const requestToken  = req.signedCookies;
 		res.clearCookie('refreshToken');
-		/*RefreshToken.findOneAndDelete({ token: requestToken }, { useFindAndModify: false })
-			.exec()
-			.then(() => res.status(204).json({ message: 'loggedout' }))
-			.catch((err) => res.status(500).json({ message: err }));*/
+		const conn = await connection;
+		const rf = conn.manager.getRepository(RefreshToken);
+		rf.delete({user: req.user, token: requestToken}).then(() => res.status(204).json({ message: 'loggedout' })).catch((err) =>res.status(500).json({ message: err }));
 	} catch (err) {
 		res.status(400).json({ message: 'user was not logged in' });
 	}
@@ -274,66 +193,6 @@ const logout = async (req: Request, res: Response): Promise<void> => {
 const getUser = async (req: Request, res: Response): Promise<void> => {
 	const user = req.user as User;
 	res.status(200).json(user);
-};
-
-const findUser = async (req: Request, res: Response): Promise<void> => {
-	/*User.findOne({ _id: req.params.userId })
-		.exec()
-		.then((user) => {
-			return res.status(200).json({
-				user: user,
-			});
-		})
-		.catch((error) => {
-			return res.status(500).json({
-				message: error.message,
-				error,
-			});
-		});*/
-};
-
-const updateUser = async (req: Request, res: Response): Promise<void> => {
-	const { username, password, email, admin, favoriten } = req.body;
-	const user = req.user as User;
-	if (password) {
-		hash(password, 10, (hashError, hash) => {
-			if (hashError) {
-				return res.status(401).json({
-					message: hashError.message,
-					error: hashError,
-				});
-			}
-			/*User.findOneAndUpdate(
-				{ _id: req.params.userId },
-				{ username: username, password: hash, email: email, admin: admin },
-				{
-					new: true,
-				},
-			)
-				.then((updateUser) => res.status(200).send(updateUser))
-				.catch((err) =>
-					res.status(500).json({
-						message: err.message,
-						err,
-					}),
-				);*/
-		});
-	} else {
-		/*User.findOneAndUpdate(
-			{ _id: req.params.userId },
-			{ username: username, password: user.password, email: email, admin: admin, favoriten: favoriten },
-			{
-				new: true,
-			},
-		)
-			.then((updateUser) => res.status(200).send(updateUser))
-			.catch((err) =>
-				res.status(500).json({
-					message: err.message,
-					err,
-				}),
-			);*/
-	}
 };
 const allUsers = async (req: Request, res: Response): Promise<any> => {
 	const conn = await connection;
@@ -379,19 +238,10 @@ const allUsers = async (req: Request, res: Response): Promise<any> => {
 	return res.status(400).json({
 		message: 'not implemented',
 	});
-	/*User.find({})
-		.then((users) => res.status(200).send(users))
-		.catch((err) =>
-			res.status(500).json({
-				message: err.message,
-				err,
-			}),
-		);*/
 };
 
 const getcaptcha = async (req: Request, res: Response): Promise<any> => {
 	const conn = await connection;
-	//console.log(req.user);
 	const r = 10;
 	const w = 220;
 	const h = 120;
@@ -446,8 +296,7 @@ const changeName = async (req: Request, res: Response): Promise<void> => {
 	const { username } = req.body;
 	const ID = { _id: req.params.userId };
 	const update = { username: username };
-
-
+	
 	/*User.findOneAndUpdate(ID, update, {
 		new: true,
 	})
@@ -490,9 +339,7 @@ const changePassword = async (req: Request, res: Response): Promise<void> => {
 };
 export default { 
 	register, 
-	login, 
-	findUser, 
-	updateUser, 
+	login,
 	logout, 
 	getUser, 
 	refreshToken, 
