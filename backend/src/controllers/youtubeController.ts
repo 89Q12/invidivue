@@ -10,9 +10,9 @@ import { Channel } from "../entity/Channel";
 import { User } from "../entity/User";
 import { Search } from "../entity/Search";
 import { Video } from "../entity/Video";
-import { UV_FS_O_FILEMAP } from "constants";
 var connection = createConnection();
 const youtube = new Client();
+
 //https://www.youtube.com/watch?v=dQw4w9WgXcQ //Just youtube url 
 const getVideoById = async (req, res): Promise<Response> => {
     if(req.query["v"]){
