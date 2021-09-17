@@ -5,7 +5,7 @@
 		</div>
 		<div class="videoInfo">
 			<p>{{ video.videoDetails.title }}</p>
-			<p>{{ video.videoDetails.author.name }}| {{ video.videoDetails.author.subscriber_count / 1000 }}K</p>
+			<a  @click="goToChannel" ><p>{{ video.videoDetails.author.name }}| {{ video.videoDetails.author.subscriber_count / 1000 }}K</p></a>
 			<p>Uploaded: {{ video.videoDetails.uploadDate }}</p>
 			<p>Views: {{ video.videoDetails.viewCount / 1000 }}K</p>
 			<p>Likes: {{ video.videoDetails.likes / 1000 }}K</p>
@@ -46,11 +46,16 @@ export default {
 			localStorage.setItem('current_video', id);
 			router.push('video');
 		}
+		async function goToChannel(){
+			await store.dispatch('get_channel', video.value.channelId);
+			router.push({path: 'channel', query: { query: video.value.channelId }});
+		}
 		return {
 			video,
 			router,
 			watchWithId,
 			store,
+			goToChannel,
 		};
 	},
 };
