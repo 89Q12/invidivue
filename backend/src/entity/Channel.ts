@@ -5,8 +5,8 @@ import { Video } from "./Video";
 export class Channel{
     @PrimaryGeneratedColumn()id: number;
     @Column()channelid: string;
-    @Column({type: "text"})cache: string;
-    @Column({type: "text"})newestcache: string;
+    @Column({type: "text",nullable: true})cache: string;
+    @Column({type: "text",nullable: true})newestcache: string;
     @UpdateDateColumn()lastloaded: Date;
     
     @ManyToMany(type => User, user => user.id)
