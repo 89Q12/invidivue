@@ -9,20 +9,27 @@
     <div class="channellist" v-for="sub in subscriptions" v-bind:key="sub">
         <div class="channelthumbnail">
         <img :src="sub.jsoncache.authorThumbnails[0].url">
+        <SubscribeButton :cid="sub.jsoncache.authorId" unsub/>
         </div>
         <div class="infotextright">
         <p>{{sub.jsoncache.author}}</p>
         <p>{{sub.jsoncache.authorId}}</p>
         <a>{{sub.jsoncache.authorUrl}}</a>
         <p>{{sub.jsoncache.subscriberText}}</p>
+        
         </div>
+
     </div>
 </div>
 </template>
 <script lang="ts">
+import SubscribeButton from '../components/SubscribeButton.vue';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { reactive, ref, computed } from 'vue';
 export default {
+    components: {
+		SubscribeButton,
+	},
     setup() {
         //const { data:subscriptions } = await axios.get('http://localhost:5000/ay/subscriptions',{headers: {'Authorization': "Bearer "+localStorage.getItem('token')}});
         const subscriptions=ref();

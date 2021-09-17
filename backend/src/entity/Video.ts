@@ -6,10 +6,10 @@ import { Watch } from "./Watch";
 export class Video{
     @PrimaryGeneratedColumn()id: number;
     @Column()ytid: string;
-    @Column()seconds: number;
-    @Column()internalclicks: number;
+    @Column({nullable: true})seconds: number;
+    @Column({nullable: true})internalclicks: number;
     @Column({type: "text"})cache: string;
-    @Column()guesseddate: Date;
+    @Column({nullable: true})guesseddate: Date;
     @UpdateDateColumn()lastloaded: Date;
     @CreateDateColumn()created: Date;
     @OneToMany(type => Watch, watch => watch.id)
