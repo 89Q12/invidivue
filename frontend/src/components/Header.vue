@@ -1,21 +1,17 @@
 <template>
-	<header>
-		<nav>
-			<div class="start">
-				<router-link to="/" class="menu-item-invidivue">INVIDIVUE</router-link>
+	<header class="container">
+		<div class="navbar row">
+			<div class="col-4">
+				<router-link to="/" class="fw-bold">INVIDIVUE</router-link>
 			</div>
-			<div class="menu-item-search">
+			<div class="col-4">
 				<input class="searchBar" v-model="searchParams" @keyup.enter="search()" placeholder="Search something" />
 			</div>
-			<div v-show="false">
-				<router-link to="/" class="menu-item-top" @click="store.dispatch('logout')">Logout</router-link>
+			<div class="col-4 d-flex justify-content-end">
+				<router-link v-if="!loggedIn" to="/signin">Login</router-link>
+				<router-link v-else to="/" class="menu-item-top" @click="store.dispatch('logout')">Logout</router-link>
 			</div>
-			<div class="end">
-				<router-link v-if="loggedIn=='false'" to="/signin" class="menu-item-top">Login</router-link>
-				<router-link v-if="loggedIn=='true'" to="/profile" class="menu-item-top">{{username}}</router-link>
-				
-			</div>
-		</nav>
+		</div>
 	</header>
 </template>
 
@@ -32,6 +28,7 @@ export default {
 		const store = useStore();
 		const router = useRouter();	
 		const storeusername = localStorage.getItem('username');
+
 		if (storeusername!=null){
 			console.log(storeusername)
 		username.value=storeusername;
@@ -65,20 +62,7 @@ export default {
 </script>
 
 <style lang="scss">
-header {
-	top: 0;
-	width: 100%;
-	height: 5em;
-	z-index: 999;
-	display: inline;
-	.o-switch__label {
-		color: #000000;
-	}
 
-	p {
-		color: #000000;
-	}
-}
 
 a {
 	color: #ffffff;
@@ -100,104 +84,6 @@ a {
 .searchBar:focus {
 	outline: none;
 }
-
-nav {
-	height: 100%;
-	display: flex;
-	flex-flow: row wrap;
-	align-items: center;
-	justify-content: center;
-}
-nav div {
-	width: 33.33%;
-}
-nav .end {
-	display: flex;
-	flex-direction: row;
-	justify-content: flex-end;
-	align-items: center;
-}
-nav .start {
-	display: flex;
-	flex-direction: row;
-	justify-content: flex-start;
-	align-items: center;
-}
-
-nav .menu-item {
-	padding: 10px 40px;
-	text-align: center;
-	border-bottom: 3px solid transparent;
-}
-
-nav .menu-item.active,
-nav .menu-item:hover {
-	background-color: rgb(0, 0, 0);
-	border-block-color: #e1cc81;
-}
-
-nav .menu-item a {
-	color: inherit;
-	text-decoration: none;
-}
-
-nav .menu-item-top {
-	position: relative;
-	text-align: center;
-	border-bottom: 3px solid transparent;
-}
-nav .menu-item-search {
-	position: relative;
-	text-align: center;
-	border-bottom: 3px solid transparent;
-}
-nav .menu-item-invidivue {
-	padding: 10px;
-	position: relative;
-	text-align: center;
-	font-weight: bold;
-}
-
-nav .menu-item-top.active,
-nav .menu-item-top:hover {
-	background-color: #000000;
-}
-
-nav .menu-item-top a {
-	color: inherit;
-	text-decoration: none;
-}
 @media screen and (max-width: 650px) {
-	nav {
-		height: 100%;
-		width: 100%;
-		display: flex;
-		justify-content: center;
-	}
-	nav .menu-item-top {
-		color: blue($color: #000000);
-		position: relative;
-		text-align: center;
-	}
-	nav .menu-item-search {
-		color: blue($color: #000000);
-		padding: 10px;
-		position: relative;
-		text-align: center;
-		border-bottom: 3px solid transparent;
-		width: 100%;
-	}
-	nav .end {
-		display: flex;
-		flex-direction: row;
-		justify-content: center;
-		align-items: center;
-	}
-	nav .start {
-		display: flex;
-		flex-direction: row;
-		justify-content: center;
-		align-items: center;
-	}
 }
 </style>
