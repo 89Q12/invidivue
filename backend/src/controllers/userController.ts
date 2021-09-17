@@ -38,7 +38,8 @@ connection.then(async conn=>{
 		user.token="";
 		conn.manager.save(user);
 	}
-	
+	//conn.close();
+	//connection = createConnection();
 });
 // Register Funktion
 const register = async (req: Request, res: Response): Promise<Response> => {
