@@ -5,6 +5,7 @@
             <img class="banner" :src="results.channel.authorBanners[0].url">
             
             <img :src="results.channel.authorThumbnails[0].url">
+            <SubscribeButton :cid="results.channel.authorId"/>
             <p>{{results.channel.author}}</p>
             <p>{{results.channel.authorId}}</p>
             <a>{{results.channel.authorUrl}}</a>
@@ -23,7 +24,11 @@
 import { ref, computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
+import SubscribeButton from '../components/SubscribeButton.vue';
 export default {
+    components: {
+		SubscribeButton,
+	},
 	setup() {
 		const store = useStore();
 		const router = useRouter();
