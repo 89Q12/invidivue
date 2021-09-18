@@ -9,10 +9,9 @@ import axios, { AxiosError, AxiosResponse } from 'axios';
 import {ref, computed } from 'vue';
 import { useStore } from 'vuex';
 export default {
-    setup() {
+    props: ['cid'],
+    setup(props:any) {
         const store = useStore();
-        console.log(store.state);
-        //const { data:subscriptions } = await axios.get('http://localhost:5000/ay/subscriptions',{headers: {'Authorization': "Bearer "+localStorage.getItem('token')}});
         const buttontext =  computed(() =>{
             if (store.state.user_store_module.user.subscriptions.includes(store.state.video_store_module.channel.id)){
                 return "Unsubscribe"
@@ -20,11 +19,17 @@ export default {
                 return "Subscribe"
             }
         });
+        store.subscribe((mutation, state) => {
+			if(mutation.type == "set_error"){
+                console.log(state);
+            }
+        }
+        );
         const subscribe=()=>{
             if (buttontext.value === "Subscribe"){
-                store.dispatch('subscribe_to_channel', store.state.video_store_module.channel.id)
+                store.dispatch('subscribe_to_channel',props.cid)
             }else{
-                store.dispatch('unsubscribe_to_channel', store.state.video_store_module.channel.id)
+                store.dispatch('unsubscribe_to_channel', props.cid)
             }
         }
 

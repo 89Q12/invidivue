@@ -77,15 +77,26 @@ export const video_store_module = {
 		},
 		async subscribe_to_channel(context:any, channelID: string){
 			try {
-				await axios.get(url + '/subscribe?cid=' + channelID)
+				console.log("subscribe to "+channelID);
+				axios.get(url + '/subscribe?cid=' + channelID,{headers: {'Authorization': "Bearer "+context.user_store_module.user.accessToken}})
+				.then((res: AxiosResponse) => {
+					console.log(res);
+					return res.data;
+				});
 			} catch (error: any) {
+				console.log(error);
 				context.commit('set_error', error);
 			}
 		},
 		async unsubscribe_to_channel(context:any, channelID: string){
 			try {
-				await axios.get(url + '/unsubscribe?cid=' + channelID)
+				await axios.get(url + '/unsubscribe?cid=' + channelID,{headers: {'Authorization': "Bearer "}})
+				.then((res: AxiosResponse) => {
+					
+					return res.data;
+				});
 			} catch (error: any) {
+				console.log(error);
 				context.commit('set_error', error);
 			}
 		}

@@ -54,7 +54,7 @@ export default {
 					store.dispatch('set_username', form.username);
 					localStorage.setItem('token', res.data.accesstoken );
 
-					
+					store.state.user_store_module.user.token=res.data.accesstoken;
 					router.push('/');
 				})
 				.catch((error: AxiosError) => {

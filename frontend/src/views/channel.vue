@@ -34,19 +34,10 @@ export default {
 		const router = useRouter();
 		const results = computed(() => store.state.video_store_module.channel);
         
-        store.subscribe((type,state)=>{
-            console.log(type,state)
-        })
-        store.subscribe((mutation, state) => {
-			if(mutation.type == "set_channel"){
-                console.log(JSON.stringify(state, null, 2));
-			}
-		})
+      
 		if(router.currentRoute.value.query.id){
 			store.dispatch('get_channel', router.currentRoute.value.query.id);
 		}
-        console.log(results);
-        console.log(JSON.stringify(results.value, null, 2));
 		return {
             results,
 			router,
