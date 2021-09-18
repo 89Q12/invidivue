@@ -11,7 +11,7 @@
         <img :src="sub.jsoncache.authorThumbnails[0].url">
         <SubscribeButton :cid="sub.jsoncache.authorId" unsub/>
         </div>
-        <router-link to="channel?cid={{sub.jsoncache.authorId}}">
+        <router-link :to="'channel?id='+sub.jsoncache.authorId ">
         <div class="infotextright">
         <p>{{sub.jsoncache.author}}</p>
         <p>{{sub.jsoncache.authorId}}</p>
