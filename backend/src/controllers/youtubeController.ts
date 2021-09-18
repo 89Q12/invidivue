@@ -29,7 +29,7 @@ const getVideoById = async (req, res): Promise<Response> => {
             }
             newvideo.internalclicks=1;
             newvideo.cache=JSON.stringify(url);
-            db.save(Video, newvideo);
+            await db.save(Video, newvideo);
         }
         return res.status(200).json({
             message: 'OK',
@@ -106,7 +106,7 @@ const getcachedchannel= async (channelid:string) => {
             const channel = await getchannelinfo(channelid);
             json = channel;
             dbchan.cache=JSON.stringify(channel);
-            db.save(Channel,dbchan);
+            await db.save(Channel,dbchan);
         }else{
             json= JSON.parse(dbchan.cache);
         }
@@ -119,7 +119,7 @@ const getcachedchannel= async (channelid:string) => {
             const newchannel = new Channel();
             newchannel.channelid=channel.authorId;
             newchannel.cache=JSON.stringify(channel);
-            db.save(Channel,newchannel);
+            await db.save(Channel,newchannel);
             channel["dbchannel"] = newchannel;
             return channel;
         }
@@ -147,7 +147,7 @@ const getnewestvideoscached = async (channelid:string) => {
         if((new Date()).getTime()- dbchan.lastloaded.getTime()>(1000*60*60) || dbchan.newestcache==""){
             const newest = await getnewestvideos(dbchan.channelid);
             dbchan.newestcache=JSON.stringify(newest);
-            db.save(Channel,dbchan);
+            await db.save(Channel,dbchan);
         }else{
             return JSON.parse(dbchan.newestcache);
         }
