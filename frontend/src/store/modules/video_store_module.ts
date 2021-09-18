@@ -8,7 +8,6 @@ export const video_store_module = {
 		channel: {},
 		search_results: [],
 		search_query:"",
-		username:"",
 		errors: [] as AxiosError[],
 	}),
 	mutations: {
@@ -32,9 +31,6 @@ export const video_store_module = {
 		},
 		set_error(state: any, error: AxiosError) {
 			state.errors.push(error);
-		},
-		set_username(state: any, username: Record<string, unknown>) {
-			state.username=username;
 		},
 	},
 	actions: {
@@ -79,8 +75,19 @@ export const video_store_module = {
 				context.commit('set_error', err);
 			}
 		},
-		async set_username(context: any, username: string) {
-			context.commit('set_username', username);
+		async subscribe_to_channel(context:any, channelID: string){
+			try {
+				await axios.get(url + '/subscribe?cid=' + channelID)
+			} catch (error: any) {
+				context.commit('set_error', error);
+			}
+		},
+		async unsubscribe_to_channel(context:any, channelID: string){
+			try {
+				await axios.get(url + '/unsubscribe?cid=' + channelID)
+			} catch (error: any) {
+				context.commit('set_error', error);
+			}
 		}
 	},
 };
