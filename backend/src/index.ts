@@ -4,14 +4,19 @@ import * as cors from 'cors';
 import * as passport from 'passport';
 // midlleware imports
 import passportStrat from './middleware/passport';
-// config imports
+// utils imports
 import logging from './config/logging';
+import db from './utils/dbUtils';
 // routes imports
 import * as userRoutes from './routes/user';
 import * as userYoutube from './routes/youtube';
 import controller from './controllers/youtubeController';
 const NAMESPACE = 'Server';
 
+logging.info(NAMESPACE, 'Running database setup');
+(async () => {
+    await db.setUp();
+})();
 const app = express();
 
 /**
