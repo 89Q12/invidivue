@@ -1,15 +1,15 @@
 <template>
-	<div class="center">
+	<div class="container d-flex justify-content-center">
 		<div class="form">
 				<label>Username</label>
-				<input type="text" v-model="form.username" required />
+				<input class="form-control" type="text" v-model="form.username" required />
 				<label>Password</label>
-				<input type="password" v-model="form.password" />
+				<input class="form-control" type="password" v-model="form.password" />
                 <label>Repeat Password</label>
-				<input type="password" v-model="form.passwordrepeat" />
+				<input class="form-control" type="password" v-model="form.passwordrepeat" />
                 <p><img :src="captchaimg" @click="pointImage"></p>
                 <label>Captcha</label>
-				<input readonly type="text" v-model="form.captcha" required />
+				<input class="form-control" readonly type="text" v-model="form.captcha" required />
 				<div v-if="Errors.length">
 					<div>
 						<ul>
@@ -17,16 +17,13 @@
 						</ul>
 					</div>
 				</div>
-				<div>
-					<router-link to="/signup">Create an account</router-link>
-				</div>
-				<button type="submit" @click="submitForm">Login</button>
+				<button type="submit" @click="submitForm">register</button>
 		</div>
 	</div>
 </template>
 <script lang="ts">
 import axios, { AxiosError, AxiosResponse } from 'axios';
-import { reactive, ref, computed } from 'vue';
+import { reactive, ref } from 'vue';
 import { useStore } from 'vuex';
 import { UserRegisterSchema } from '../utils/formValidation';
 import { useRouter } from 'vue-router';
@@ -63,7 +60,7 @@ export default {
             console.log(x+" "+y)
             form.captcha=x+","+y;
         }
-        const submitForm=async (): Promise<void> =>{
+        const submitForm = async (): Promise<void> =>{
             Errors.splice(0, Errors.length);
             validForm.value = await UserRegisterSchema.validate(form).catch((err: Error) => Errors.push(err));
             if (Errors.length) {

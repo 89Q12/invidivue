@@ -1,10 +1,10 @@
 <template>
-	<div class="center">
+	<div class="container d-flex justify-content-center">
 		<div class="form">
 			<label>Username</label>
-			<input type="text" v-model="form.username" required />
+			<input class="form-control outline-none" type="text" v-model="form.username" required />
 			<label>Password</label>
-			<input type="password" v-model="form.password" @keyup.enter="submitForm" />
+			<input class="form-control outline-none" type="password" v-model="form.password" @keyup.enter="submitForm" />
 			<div v-if="Errors.length">
 				<div>
 					<ul>
@@ -72,6 +72,3 @@ export default {
 	},
 };
 </script>
-<style lang="scss">
-
-</style>
