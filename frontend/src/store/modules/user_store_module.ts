@@ -6,7 +6,7 @@ export const user_store_module = {
         user: {
             username: '',
             password: '',
-            subscriptions: [] as string[],
+            subscriptions: [] ,
             isAdmin: false,
             isAuthenticated: false,
             accessToken: '',
@@ -40,6 +40,9 @@ export const user_store_module = {
         },
         setAccessToken(state: any, token: string) {
 			state.user.accessToken = token;
+		},
+		set_username(state: any, username: Record<string, unknown>) {
+			state.user.username=username;
 		},
     },
     actions: {
@@ -107,5 +110,8 @@ export const user_store_module = {
 					console.log(error);
 				});
 		},
+		async set_username(context: any, username: string) {
+			context.commit('set_username', username);
+		}
     },
 };

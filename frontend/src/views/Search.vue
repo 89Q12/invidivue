@@ -12,8 +12,6 @@
 						<a @click="gotochannel(video.id)" ><p>{{ video.name }}</p></a>
 						<p>{{ video.videoCount }} videos</p>
 						<p>{{ video.subscriberCount }}Subscribers</p>
-						
-            			
 				</div>
 			</div>
 			<div v-else>

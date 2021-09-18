@@ -8,6 +8,7 @@
 				<input class="searchBar" v-model="searchParams" @keyup.enter="search()" placeholder="Search something" />
 			</div>
 			<div class="col-4 d-flex justify-content-end">
+				<router-link to="/profile">{{username}}</router-link>
 				<router-link v-if="!loggedIn" to="/signin">Login</router-link>
 				<router-link v-else to="/" class="menu-item-top" @click="store.dispatch('logout')">Logout</router-link>
 			</div>
@@ -31,7 +32,7 @@ export default {
 
 		if (storeusername!=null){
 			console.log(storeusername)
-		username.value=storeusername;
+			username.value=storeusername;
 		}
 		store.subscribe((mutation, state) => {
 			if(mutation.type == "set_search_query"){
