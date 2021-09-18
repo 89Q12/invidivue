@@ -4,29 +4,22 @@ import { Response } from "express";
 import  { Client } from "youtubei";
 import * as ytch from 'yt-channel-info';
 import * as ytdl from 'ytdl-core';
-
-import {Any, createConnection, EntityTarget, In, Repository} from "typeorm";
 import { Channel } from "../entity/Channel";
 import { User } from "../entity/User";
 import { Search } from "../entity/Search";
 import { Video } from "../entity/Video";
-var connection = createConnection();
+import  db from '../utils/dbUtils';
 const youtube = new Client();
 
 //https://www.youtube.com/watch?v=dQw4w9WgXcQ //Just youtube url 
 const getVideoById = async (req, res): Promise<Response> => {
     if(req.query["v"]){
         const vid= encodeURIComponent(req.query["v"]);
-        
-        const conn = await connection;
-        const videos = conn.getRepository(Video);
-        const video = await videos.findOne({ytid:vid}).catch((reason:any)=>console.log(reason));
-        
         const url = await ytdl.getInfo('http://www.youtube.com/watch?v='+vid);
-        
+        const video = await db.findOne(Video, {ytid:vid});
         if(video){
             video.internalclicks++;
-            videos.save(video);
+            db.save(Video, video);
         }else{
             let newvideo=new Video();
             if(url["videoDetails"]){
@@ -36,7 +29,7 @@ const getVideoById = async (req, res): Promise<Response> => {
             }
             newvideo.internalclicks=1;
             newvideo.cache=JSON.stringify(url);
-            videos.save(newvideo);
+            db.save(Video, newvideo);
         }
         return res.status(200).json({
             message: 'OK',
@@ -58,18 +51,15 @@ const getResults = async (req, res): Promise<Response> => {
         
         var ONE_HOUR = 60 * 60 * 1000;
         let reloadflag = false;
-        const conn = await connection;
-            const searches = await conn.getRepository(Search);
         if(req.query["forcereload"]){
             reloadflag=true;
         }else{
-            
-            const s = await searches.findOne({query:query});
-            if(s){
-                if(((new Date()).getTime() -s.lastloaded.getTime())<ONE_HOUR){
+            const search = await db.findOne(Search, {query:query});
+            if(search){
+                if(((new Date()).getTime() -search.lastloaded.getTime())<ONE_HOUR){
                     return res.status(200).json({
                         message: 'OK',
-                        ytvideos:s.cache,
+                        ytvideos:search.cache,
                     });
                 }else{
                     reloadflag=true;
@@ -86,11 +76,11 @@ const getResults = async (req, res): Promise<Response> => {
             let dbsearch = new Search();
             dbsearch.query=query;
             dbsearch.cache=JSON.stringify(videos);
+            await db.save(Search,dbsearch);
             return res.status(200).json({
                 message: 'OK',
                 ytvideos:videos,
             });
-            await searches.save(dbsearch);
         }else{
             return res.status(400).json({
                 message: 'not implemented',
@@ -109,16 +99,14 @@ const getchannelinfo =async (id:string) =>{
     return channel;
 };
 const getcachedchannel= async (channelid:string) => {
-    const conn = await connection;
-    const channels = conn.getRepository(Channel);
-    const dbchan = await channels.findOne({channelid:channelid});
+    const dbchan = await db.findOne(Channel,{channelid:channelid});
     if(dbchan){
         let json= {}
         if(dbchan.cache==""){
             const channel = await getchannelinfo(channelid);
             json = channel;
             dbchan.cache=JSON.stringify(channel);
-            channels.save(dbchan);
+            db.save(Channel,dbchan);
         }else{
             json= JSON.parse(dbchan.cache);
         }
@@ -131,7 +119,7 @@ const getcachedchannel= async (channelid:string) => {
             const newchannel = new Channel();
             newchannel.channelid=channel.authorId;
             newchannel.cache=JSON.stringify(channel);
-            channels.save(newchannel);
+            db.save(Channel,newchannel);
             channel["dbchannel"] = newchannel;
             return channel;
         }
@@ -149,19 +137,17 @@ const getnewestvideos = async (channelId:string) => {
     return await getvideos(channelId,'newest');
 };
 const getnewestvideoscached = async (channelid:string) => {
-    const conn = await connection;
-    const channels = conn.getRepository(Channel);
-    let dbchan = await channels.findOne({channelid:channelid});
+    let dbchan = await db.findOne(Channel,{channelid:channelid});
     if(dbchan){
     }else{
         getcachedchannel(channelid);
-        dbchan = await channels.findOne({channelid:channelid});
+        dbchan = await db.findOne(Channel,{channelid:channelid});
     }
     if(dbchan){
         if((new Date()).getTime()- dbchan.lastloaded.getTime()>(1000*60*60) || dbchan.newestcache==""){
             const newest = await getnewestvideos(dbchan.channelid);
             dbchan.newestcache=JSON.stringify(newest);
-            channels.save(dbchan);
+            db.save(Channel,dbchan);
         }else{
             return JSON.parse(dbchan.newestcache);
         }
@@ -185,8 +171,7 @@ const getChannel = async (req, res): Promise<Response> => {
     });
 };
 const subscribeuser= async (channel:Channel,user:User):Promise<boolean> => {
-    const conn = await connection;
-    const users = conn.getRepository(User);
+    const users = await db.get_repo(User);
     const sqlresult= await users.createQueryBuilder("user")
     .leftJoinAndSelect("user.subscriptions","channel")
     .where("user.id=:id",{id:user.id})
@@ -209,9 +194,8 @@ const subscribe = async (req, res): Promise<Response> => {
         //console.log(req);
         if(req.query["cid"]){
             const cid = req.query.cid;
-            const conn = await connection;
-            const channels = conn.getRepository(Channel);
-            const users = conn.getRepository(User);
+            const channels = await db.get_repo(Channel);
+            const users = await db.get_repo(User);
             const user = await users.findOne(req.user,{ relations: ["subscriptions"] });
             if(user){
                 const dbchan = await channels.findOne({channelid:cid});
@@ -276,9 +260,8 @@ const unsubscribe = async (req, res): Promise<Response> => {
     if(req.user){
         if(req.query.cid){
             const cid = req.query.cid;
-            const conn = await connection;
-            const channels = conn.getRepository(Channel);
-            const users = conn.getRepository(User);
+            const channels = await db.get_repo(Channel);
+            const users = await db.get_repo(User);
             const user = await users.findOne(req.user,{ relations: ["subscriptions"] });
             if(user){
                 const dbchan = await channels.findOne({channelid:cid});
@@ -327,8 +310,7 @@ const unsubscribe = async (req, res): Promise<Response> => {
 };
 const getSubscriptions = async (req, res): Promise<Response> => {
     if(req.user){
-        const conn = await connection;
-        const users = conn.getRepository(User);
+        const users = await db.get_repo(User);
         const user = await users.findOne(req.user,{ relations: ["subscriptions"] });
         
         if(user){
@@ -349,8 +331,7 @@ const getSubscriptions = async (req, res): Promise<Response> => {
 
 const uploadnewpipesubs = async (req, res): Promise<Response> => {
     if(req.user){
-        const conn = await connection;
-        const users = conn.getRepository(User);
+        const users = await db.get_repo(User);
         const user = await users.findOne(req.user,{ relations: ["subscriptions"] });
         //console.log(req.body);
         if(user){
@@ -434,8 +415,6 @@ const publishedtexttomillis=(text)=>{
 }
 
 const updateChannel= async (channel)=>{
-    const conn = await connection;
-    const videos = conn.getRepository(Video);
     const newest = await getnewestvideoscached(channel.channelid);
             
             if(newest){
@@ -446,7 +425,7 @@ const updateChannel= async (channel)=>{
                         
                         if(item["videoId"]){
                             const videoId = item["videoId"];
-                            const video = await videos.findOne({ytid:videoId});
+                            const video = await db.findOne(Video,{ytid:videoId});
                             if(video){
                                 //console.log("indb");
                                 break;
@@ -463,7 +442,7 @@ const updateChannel= async (channel)=>{
                                     newvideo.guesseddate=new Date((new Date()).getTime()-publishedtexttomillis(item["publishedText"]));
                                 }
                                 newvideo.cache=JSON.stringify(item);
-                                videos.save(newvideo);
+                                db.save(Video,newvideo);
                                 
                             }
                         }
@@ -472,8 +451,7 @@ const updateChannel= async (channel)=>{
             }
 }
 const updatefeeds= async()=>{
-    const conn = await connection;
-    const channels = conn.getRepository(Channel);
+    const channels = await db.get_repo(Channel);
     const count = await channels.createQueryBuilder().getCount();
     const pagesize= 50;
     for (let i = 0; i < count; i+=pagesize) {
@@ -487,15 +465,11 @@ const updatefeeds= async()=>{
 };
 const getFeed = async (req, res): Promise<Response> => {
     if(req.user){
-        const conn = await connection;
-        const users = conn.getRepository(User);
-        const channels = conn.getRepository(Channel);
+        const users =await db.get_repo(User);
         const user = await users.findOne(req.user,{ relations: ["subscriptions"] });
-        let out = [];
         const subs = user.subscriptions;
-        const videos = conn.getRepository(Video);
+        const videos = await db.get_repo(Video);
         let chids=[];
-        let newvids=[];
         for (let index = 0; index < subs.length; index++) {
             console.log(index +" / "+ subs.length);
             const channel = subs[index];
@@ -524,4 +498,14 @@ const getFeed = async (req, res): Promise<Response> => {
 	});
 }
 
-export default { getVideoById,getResults,getChannel,subscribe,unsubscribe,getSubscriptions,uploadnewpipesubs,getFeed,updatefeeds };
+export default {
+    getVideoById,
+    getResults,
+    getChannel,
+    subscribe,
+    unsubscribe,
+    getSubscriptions,
+    uploadnewpipesubs,
+    getFeed,
+    updatefeeds
+};
