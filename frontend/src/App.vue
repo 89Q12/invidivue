@@ -29,6 +29,29 @@ div .center {
 	margin-right: 25%;
 	margin-left: 25%;
 }
+.outline-none{
+	outline: none !important;
+}
+.form {
+	margin-top: 2.5em;
+	color: #ffffff;
+	word-wrap: break-word;
+    width: 50%;
+}
+
+.form {
+	border: none;
+}
+.form button {
+	font-size: 100%;
+	margin-top: 0.5em;
+	padding: 0.5em 1em;
+	background-color: #a0a0a0;
+	box-shadow: none;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+}
 #app {
 	margin-left: 5vw;
 	margin-right: 5vw;
@@ -74,35 +97,7 @@ video {
 	//height: 500pt; switch with js to hide info
 overflow: hidden;
 }
-.form {
-	margin-top: 2.5em;
-	color: #ffffff;
-	word-wrap: break-word;
-}
-.form input {
-	padding: 0.5em 0.6em;
-	margin-top: 0.5em;
-	margin-bottom: 0.5em;
-	border-radius: 4px;
-	width: 100%;
-	height: 50%;
-}
-.form input:focus {
-	outline: none;
-}
-.form {
-	border: none;
-}
-.form button {
-	font-size: 100%;
-	margin-top: 0.5em;
-	padding: 0.5em 1em;
-	background-color: #a0a0a0;
-	box-shadow: none;
-	border: none;
-	border-radius: 4px;
-	cursor: pointer;
-}
+
 .error{
 	color:lightcoral;
 }
