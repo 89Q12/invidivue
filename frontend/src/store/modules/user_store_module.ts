@@ -6,7 +6,7 @@ export const user_store_module = {
         user: {
             username: '',
             password: '',
-            subscriptions: [] as {},
+            subscriptions: [] as string[],
             isAdmin: false,
             isAuthenticated: false,
             accessToken: '',
@@ -43,20 +43,20 @@ export const user_store_module = {
 		},
     },
     actions: {
-		async getloggedInUser({ commit, state }) {
+		async getloggedInUser(context: any) {
 			const value = localStorage.getItem('loggedIn') || 'false';
-			if (JSON.parse(value) === true && state.user.accessToken) {
+			if (JSON.parse(value) === true && context.state.user.accessToken) {
 				await axios
 					.get(url + 'getuser', {
 						headers: {
-							Authorization: 'Bearer ' + state.user.accessToken,
+							Authorization: 'Bearer ' + context.state.user.accessToken,
 						},
 					})
-					.then((res: AxiosResponse) => commit('setLoggedInUser', res.data))
+					.then((res: AxiosResponse) => context.commit('setLoggedInUser', res.data))
 					.catch((error: AxiosError) => {
 						console.log(error);
 					});
-			} else if (JSON.parse(value) === true && !state.user.accessToken) {
+			} else if (JSON.parse(value) === true && !context.state.user.accessToken) {
 				await axios
 					.post(
 						url + 'refreshtoken',
@@ -67,7 +67,7 @@ export const user_store_module = {
 						},
 					)
 					.then((res: AxiosResponse) => {
-						commit('setAccessToken', res.data.accesstoken);
+						context.commit('setAccessToken', res.data.accesstoken);
 						axios
 							.get(url + 'getuser', {
 								headers: {
@@ -75,19 +75,19 @@ export const user_store_module = {
 									Authorization: 'Bearer ' + res.data.accesstoken,
 								},
 							})
-							.then((res: AxiosResponse) => commit('setLoggedInUser', res.data))
+							.then((res: AxiosResponse) => context.commit('setLoggedInUser', res.data))
 							.catch((error: AxiosError) => {
 								console.log(error);
 							});
 					})
 					.catch((error: AxiosError) => {
 						if (error.response?.status != 500) {
-							commit('setUserLoggedOut');
+							context.commit('setUserLoggedOut');
 						}
 					});
 			}
 		},
-		async logout({ commit, state }) {
+		async logout(context: any) {
 			await axios
 				.post(
 					url + 'logout',
@@ -95,12 +95,12 @@ export const user_store_module = {
 					{
 						withCredentials: true,
 						headers: {
-							Authorization: 'Bearer ' + state.user.accessToken,
+							Authorization: 'Bearer ' + context.state.user.accessToken,
 						},
 					},
 				)
 				.then((res: AxiosResponse) => {
-					commit('setUserLoggedOut');
+					context.commit('setUserLoggedOut');
 					localStorage.removeItem('loggedIn');
 				})
 				.catch((error: AxiosError) => {
