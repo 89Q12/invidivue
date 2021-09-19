@@ -1,15 +1,16 @@
 <template>
 	<header class="mx-auto mt-auto">
 		<div class="navbar row">
-			<div class="col-4">
+			<div class="col-xl-4">
 				<router-link to="/" class="fw-bold">INVIDIVUE</router-link>
 			</div>
-			<div class="col-4">
+			<div class="col-xl-4">
 				<input class="searchBar" v-model="searchParams" @keyup.enter="search()" placeholder="Search something" />
 			</div>
-			<div class="col-4 d-flex justify-content-end">
-				<router-link to="/profile">{{username}}</router-link>
-				<router-link v-if="!loggedIn" to="/signin">Login</router-link>
+			<div class="col-2"></div>
+			<div class="col-xl-2 d-flex justify-content-between">
+				<router-link to="/profile">{{ store.state.user_store_module.user.username }}</router-link>
+				<router-link v-if="!store.state.user_store_module.user.isAuthenticated" to="/signin">Login</router-link>
 				<router-link v-else to="/" class="menu-item-top" @click="store.dispatch('logout')">Logout</router-link>
 			</div>
 		</div>
@@ -17,7 +18,7 @@
 </template>
 
 <script lang="ts">
-import { ref } from 'vue';
+import { ref,computed } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 		
@@ -28,18 +29,10 @@ export default {
 		const username = ref<string>('');
 		const store = useStore();
 		const router = useRouter();	
-		const storeusername = localStorage.getItem('username');
 
-		if (storeusername!=null){
-			console.log(storeusername)
-			username.value=storeusername;
-		}
 		store.subscribe((mutation, state) => {
 			if(mutation.type == "set_search_query"){
 				searchParams.value=mutation.payload;
-			}
-			if(mutation.type == 'set_username'){
-				username.value=mutation.payload;
 			}
 		})
 		async function search() {
@@ -47,14 +40,10 @@ export default {
 				store.dispatch('get_search_result', searchParams.value);
 				router.push({ path: 'search', query: { query: searchParams.value } })
 			}
-		}
-		const loggedIn= localStorage.getItem('loggedIn');
-		
+		}		
 		return {
 			searchParams,
 			store,
-			loggedIn,
-			username,
 			search,
 		};
 	},
@@ -84,7 +73,5 @@ a {
 }
 .searchBar:focus {
 	outline: none;
-}
-@media screen and (max-width: 650px) {
 }
 </style>
