@@ -3,7 +3,6 @@ import {createConnection, Repository } from 'typeorm';
 import {Group} from '../entity/Group'
 import { User } from '../entity/User';
 const connection = createConnection();
-
 async function findOne(entity: any, filter: any) {
 	const conn = await get_repo(entity);
 	try {
@@ -32,6 +31,7 @@ async function get_repo(entity: any): Promise<Repository<any>> {
     return conn.manager.getRepository(entity);
 }
 async function setUp(){
+    await (await connection).synchronize();
 	const group_admin = await creategroupifnotexists("admin");
 	const group_user = await creategroupifnotexists("user");
 	const username = process.env.SERVER_ADMIN_NAME;
