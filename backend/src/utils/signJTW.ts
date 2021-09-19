@@ -3,7 +3,7 @@ import logging from '../config/logging';
 
 const NAMESPACE = 'Auth';
 
-const signJWT = (user_id: string, callback: (error: Error | null, token: string | null) => void): void => {
+const signJWT = (user_id: number, callback: (error: Error | null, token: string | null) => void): void => {
 	const date = new Date();
 	date.setSeconds(Date.now() + parseInt(process.env.SERVER_TOKEN_EXPIRETIME_ACCESS));
 	const expiredAt = parseInt(process.env.SERVER_TOKEN_EXPIRETIME_ACCESS);
