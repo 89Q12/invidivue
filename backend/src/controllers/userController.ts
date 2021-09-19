@@ -112,9 +112,8 @@ const refreshToken = async (req: Request, res: Response): Promise<Response> => {
 		}
 
 		if (RToken.default.verifyExpiration(tokenobj)) {
-			console.log('d');
 			res.clearCookie('refreshToken');
-			rtokens.remove(refreshToken);
+			rtokens.remove(tokenobj);
 			res.status(403).json({
 				message: 'Refresh token was expired. Please make a new signin request',
 			});
@@ -156,7 +155,6 @@ const getUser = async (req: Request, res: Response): Promise<void> => {
 	res.status(200).json(user);
 };
 const allUsers = async (req: Request, res: Response): Promise<any> => {
-	//console.log(req.user);
 	if (req.user) {
 		const users = await db.get_repo(User);
 		const currentuser = await users.findOne(req.user);
