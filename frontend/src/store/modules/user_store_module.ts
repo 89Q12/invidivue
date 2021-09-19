@@ -1,4 +1,5 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
+import router from '@/router';
 const url = 'http://localhost:5000/api/user';
 export const user_store_module = {
     state: () => ({
@@ -19,7 +20,7 @@ export const user_store_module = {
     }),
 	mutations: {
 		setLoggedInUser(state: any, user: any) {
-			state.user.username = user.username || '';
+			state.user.username = user.name || '';
 			state.user.password = user.password || '';
 			state.user.subscriptions = user.subscriptions || [];
 			state.user.isAuthenticated = true;
@@ -41,16 +42,13 @@ export const user_store_module = {
         setAccessToken(state: any, token: string) {
 			state.user.accessToken = token;
 		},
-		set_username(state: any, username: Record<string, unknown>) {
-			state.user.username=username;
-		},
     },
     actions: {
 		async getloggedInUser(context: any) {
 			const value = localStorage.getItem('loggedIn') || 'false';
 			if (JSON.parse(value) === true && context.state.user.accessToken) {
 				await axios
-					.get(url + 'getuser', {
+					.get(url + '/getuser', {
 						headers: {
 							Authorization: 'Bearer ' + context.state.user.accessToken,
 						},
@@ -62,7 +60,7 @@ export const user_store_module = {
 			} else if (JSON.parse(value) === true && !context.state.user.accessToken) {
 				await axios
 					.post(
-						url + 'refreshtoken',
+						url + '/refreshtoken',
 						{},
 						{
 							withCredentials: true,
@@ -71,8 +69,9 @@ export const user_store_module = {
 					)
 					.then((res: AxiosResponse) => {
 						context.commit('setAccessToken', res.data.accesstoken);
+						console.log(res.data.accesstoken)
 						axios
-							.get(url + 'getuser', {
+							.get(url + '/getuser', {
 								headers: {
 									withCredentials: true,
 									Authorization: 'Bearer ' + res.data.accesstoken,
@@ -86,6 +85,7 @@ export const user_store_module = {
 					.catch((error: AxiosError) => {
 						if (error.response?.status != 500) {
 							context.commit('setUserLoggedOut');
+							router.push('signin')
 						}
 					});
 			}
@@ -93,7 +93,7 @@ export const user_store_module = {
 		async logout(context: any) {
 			await axios
 				.post(
-					url + 'logout',
+					url + '/logout',
 					{},
 					{
 						withCredentials: true,
@@ -104,14 +104,11 @@ export const user_store_module = {
 				)
 				.then((res: AxiosResponse) => {
 					context.commit('setUserLoggedOut');
-					localStorage.removeItem('loggedIn');
+					localStorage.setItem('loggedIn', "false");
 				})
 				.catch((error: AxiosError) => {
 					console.log(error);
 				});
 		},
-		async set_username(context: any, username: string) {
-			context.commit('set_username', username);
-		}
     },
 };
