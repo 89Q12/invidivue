@@ -15,7 +15,7 @@
 			<div>
 				<router-link to="/signup">Create an account</router-link>
 			</div>
-			<button @click="submitForm">Login</button>
+			<button @click="submitForm()">Login</button>
 		</div>
 	</div>
 </template>
@@ -46,15 +46,11 @@ export default {
 				return;
 			}
 			await axios
-				.post('http://localhost:5000/api/user/login', form, { withCredentials: false })
+				.post('http://localhost:5000/api/user/login', form, { withCredentials: true, })
 				.then((res: AxiosResponse) => {
-					console.log(res.data);
+					store.commit('setAccessToken', res.data.accesstoken)
 					localStorage.setItem('loggedIn', 'true');
-					localStorage.setItem('username', form.username);
-					store.dispatch('set_username', form.username);
-					localStorage.setItem('token', res.data.accesstoken );
-
-					store.state.user_store_module.user.token=res.data.accesstoken;
+					store.dispatch('getloggedInUser')
 					router.push('/');
 				})
 				.catch((error: AxiosError) => {
