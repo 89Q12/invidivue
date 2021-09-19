@@ -1,18 +1,19 @@
 <template>
 	<header class="mx-auto mt-auto">
-		<div class="navbar row">
+		<div class="navbar row align-left">
 			<div class="col-xl-4">
 				<router-link to="/" class="fw-bold">INVIDIVUE</router-link>
 			</div>
-			<div class="col-xl-4">
+			
+			<div class="col-xl-4 align-center">
 				<input class="searchBar" v-model="searchParams" @keyup.enter="search()" placeholder="Search something" />
 			</div>
-			<div class="col-2"></div>
-			<div class="col-xl-2 d-flex justify-content-between">
+			<div class="col-xl-4 d-flex align-right justify-content-between">
 				<router-link to="/profile">{{ store.state.user_store_module.user.username }}</router-link>
 				<router-link v-if="!store.state.user_store_module.user.isAuthenticated" to="/signin">Login</router-link>
 				<router-link v-else to="/" class="menu-item-top" @click="store.dispatch('logout')">Logout</router-link>
 			</div>
+			
 		</div>
 	</header>
 </template>

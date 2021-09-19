@@ -1,11 +1,9 @@
 <template>
-	<div class="col-1"></div>
-	<div class="col-10">
+	<div class="container">
 		<Header />
 		<router-view />
 		<Footer />
 	</div>
-	<div class="col-1"></div>
 </template>
 <script lang="ts">
 import Header from './components/Header.vue';

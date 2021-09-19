@@ -1,9 +1,8 @@
 <template>
 	<div class="row mx-auto">
-		<div class="col-12 mt-4"></div>
-		<div v-for="video in results" v-bind:key="video" class="col-sm-3">
+		<div v-for="video in results" v-bind:key="video" class="d-flex flex-wrap col-4" style="width: 23em;">
 			<div v-if="video.name">
-				<PlaylistCard :video="video"/>
+				<DisplayChannelCard :video="video"/>
 			</div>
 			<div v-else>
 				<VideoCard :video="video"/>
@@ -16,11 +15,11 @@
 import { ref, computed } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
-import PlaylistCard from '../components/DisplayChannelCard.vue';
+import DisplayChannelCard from '../components/DisplayChannelCard.vue';
 import VideoCard from '../components/DisplayVideoCard.vue';
 export default {
 	    components: {
-		PlaylistCard,
+		DisplayChannelCard,
 		VideoCard,
 	},
 	setup() {
