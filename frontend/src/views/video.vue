@@ -30,13 +30,15 @@
 		<div class="col-sm-8 h-100">
 			<p style="white-space: pre-line;">{{ video.videoDetails.description }}</p>
 		</div>
-		<div v-for="vid in video.related_videos" v-bind:key="vid" class="col-sm-2 related">
-				<img :src="vid.thumbnails[0].url" :height="vid.thumbnails[0].height" :width="vid.thumbnails[0].width" />
-				{{ vid.length_seconds / 100 }} Min
-				>
-			<router-link :to="'/video?v='+ vid.id"><p>{{ vid.title }}</p></router-link>
-			<router-link :to="'/channel??id='+ vid.author.id"> <p>{{ vid.author.name }}</p></router-link>
-			<p>Uploaded: {{ vid.published }} views: {{ vid.view_count / 1000 }}K</p>
+		<div class="col-sm-2">
+			<div v-for="vid in video.related_videos" v-bind:key="vid" class="related">
+					<img :src="vid.thumbnails[0].url" :height="vid.thumbnails[0].height" :width="vid.thumbnails[0].width" />
+					{{ vid.length_seconds / 100 }} Min
+					>
+				<router-link :to="'/video?v='+ vid.id"><p>{{ vid.title }}</p></router-link>
+				<router-link :to="'/channel??id='+ vid.author.id"> <p>{{ vid.author.name }}</p></router-link>
+				<p>Uploaded: {{ vid.published }} views: {{ vid.view_count / 1000 }}K</p>
+			</div>
 		</div>
 	</div>
 </template>
