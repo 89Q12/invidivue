@@ -1,16 +1,29 @@
 <template>
+	<div class="col-1"></div>
+	<div class="col-10">
 		<Header />
 		<router-view />
 		<Footer />
+	</div>
+	<div class="col-1"></div>
 </template>
 <script lang="ts">
 import Header from './components/Header.vue';
 import Footer from './components/Footer.vue';
+import { onMounted } from 'vue';
+import { useStore } from 'vuex';
 export default {
 	name: 'App',
 	components: {
 		Header,
 		Footer,
+	},
+	setup() {
+		const store = useStore();
+		onMounted(() => {
+			store.dispatch('getloggedInUser');
+		});
+		return {};
 	},
 };
 </script>
@@ -18,16 +31,8 @@ export default {
 html,
 body {
 	font-family: 'Montserrat', 'Arial', 'Helvetica', sans-serif;
-	min-height: 100vh;
-	padding: 0%;
-	margin: 0%;
 	background-color: #232323;
 	color: #a0a0a0;
-}
-div .center {
-	height: 100%;
-	margin-right: 25%;
-	margin-left: 25%;
 }
 .outline-none{
 	outline: none !important;
@@ -52,10 +57,6 @@ div .center {
 	border-radius: 4px;
 	cursor: pointer;
 }
-#app {
-	margin-left: 5vw;
-	margin-right: 5vw;
-}
 #duration{
 	position: absolute;
 	right: 0.25em;
@@ -68,13 +69,11 @@ div .center {
 .vid{
 	display: inline-block;
 	//min-width: 25%;
-	width: 280pt;
-	height: 280pt;
+	width: 100%;
 	padding: 5pt;
 	//border:1px solid white;
 }
 #video{
-	
 	display: table;
 }
 .thumbnail{
@@ -86,8 +85,7 @@ div .center {
 	width: 100%;
 }
 img.thumbnail{
-	width: 280pt;
-	height: 180pt;
+	width: 100%;
 }
 video {
 	width: -moz-available;
