@@ -54,7 +54,9 @@ app.use(passport.initialize());
 /**
  * Rules of our API
  * */
-app.use(cors({ credentials: true, origin: ['http://localhost:8080', 'http://localhost:5000'], methods: ['GET', 'POST'] }));
+ app.use(cors({ credentials: true, origin: ['http://localhost:8080','http://localhost', 'http://localhost:5000'],
+ exposedHeaders: ["set-cookie"] }));
+
 
 /**
  *  Routes go here
