@@ -59,7 +59,7 @@ const getResults = async (req, res): Promise<Response> => {
                 if(((new Date()).getTime() -search.lastloaded.getTime())<ONE_HOUR){
                     return res.status(200).json({
                         message: 'OK',
-                        ytvideos:search.cache,
+                        ytvideos:JSON.parse(search.cache),
                     });
                 }else{
                     reloadflag=true;
@@ -114,7 +114,6 @@ const getcachedchannel= async (channelid:string) => {
         return json;
     }else{
         const channel = await getchannelinfo(channelid);
-        //console.log(channel);
         if(channel){
             const newchannel = new Channel();
             newchannel.channelid=channel.authorId;
@@ -128,7 +127,6 @@ const getcachedchannel= async (channelid:string) => {
 }
 const getvideos = async (channelId:string,sortBy:string) => {
     //ytch.getChannelVideos(channelId, sortBy);
-    
    return await ytch.getChannelVideos(channelId, sortBy); 
     
 
