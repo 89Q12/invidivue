@@ -1,9 +1,13 @@
 <template>
-	<div class="container">
-		<Header />
-		<router-view />
-		<Footer />
-	</div>
+<div class="row">
+		<div class="col-1"></div>
+		<div class="col-10">
+			<Header />
+			<router-view />
+			<Footer />
+		</div>
+		<div class="col-1"></div>
+</div>
 </template>
 <script lang="ts">
 import Header from './components/Header.vue';
@@ -32,6 +36,7 @@ body {
 	background-color: #232323;
 	color: #a0a0a0;
 }
+
 .outline-none{
 	outline: none !important;
 }

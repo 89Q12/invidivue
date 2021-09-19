@@ -1,6 +1,6 @@
 <template>
-	<div class="row mx-auto">
-		<div v-for="video in results" v-bind:key="video" class="d-flex flex-wrap col-4" style="width: 23em;">
+	<div class="row ">
+		<div v-for="video in results" v-bind:key="video" class="col-3">
 			<div v-if="video.name">
 				<DisplayChannelCard :video="video"/>
 			</div>
