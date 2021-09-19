@@ -1,4 +1,4 @@
-import {Entity, PrimaryColumn, Column,ManyToMany, JoinColumn,OneToOne} from "typeorm";
+import {Entity, PrimaryColumn, Column, JoinColumn, OneToMany, ManyToOne} from "typeorm";
 import { User } from "./User";
 @Entity()
 export class RefreshToken {
@@ -8,7 +8,7 @@ export class RefreshToken {
 	@Column()
 	expiryDate: Date;
 
-	@OneToOne(() => User, user => user.id)
+	@ManyToOne(() => User, user => user.id)
     @JoinColumn()
 	user: User;
 }
