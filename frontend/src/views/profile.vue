@@ -1,6 +1,5 @@
 <template>
-
-<p>
-    <a href="subscriptions">Subscriptions</a>
-</p>
+    <p>
+        <router-link to="subscriptions">Subscriptions</router-link>
+    </p>
 </template>
