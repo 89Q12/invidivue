@@ -8,6 +8,7 @@ import signJWT from '../utils/signJTW';
 import * as RToken from '../models/refreshToken';
 import { createCanvas } from 'canvas';
 import db from '../utils/dbUtils';
+import e = require('express');
 // Register Funktion
 const register = async (req: Request, res: Response): Promise<Response> => {
 	const { username, password, captchatext, captchaid } = req.body;
@@ -97,15 +98,14 @@ const login = async (req: Request, res: Response): Promise<Response> => {
 const refreshToken = async (req: Request, res: Response): Promise<Response> => {
 	const { refreshtoken: requesttoken } = req.signedCookies;
 
-	if (requesttoken == null) {
+	if (!requesttoken) {
 		return res.status(403).json({ message: 'Refresh Token is required!' });
 	}
 
 	try {
 		const rtokens = await db.get_repo(RefreshToken);
 		const tokenobj = await rtokens.findOne({ token: requesttoken }, { relations: ['user'] });
-
-		if (!tokenobj.token) {
+		if (!tokenobj) {
 			res.clearCookie('refreshToken');
 			res.status(403).json({ message: 'Refresh token is not in database!' });
 			return;
@@ -118,21 +118,20 @@ const refreshToken = async (req: Request, res: Response): Promise<Response> => {
 				message: 'Refresh token was expired. Please make a new signin request',
 			});
 			return;
-		} else {
-			signJWT(tokenobj.user.id, (_error, token) => {
-				if (_error) {
-					return res.status(500).json({
-						message: _error.message,
-						error: _error,
-					});
-				} else if (token) {
-					return res.status(200).json({
-						message: 'Refresh erfolgreich',
-						accesstoken: token,
-					});
-				}
-			});
-		}
+		} 
+		signJWT(tokenobj.user.id, (_error, token) => {
+			if (_error) {
+				return res.status(500).json({
+					message: _error.message,
+					error: _error,
+				});
+			} else if (token) {
+				return res.status(200).json({
+					message: 'Refresh erfolgreich',
+					accesstoken: token,
+				});
+			}
+		});
 	} catch (err) {
 		return res.status(500).send({ message: err });
 	}
