@@ -18,7 +18,7 @@ import { useRouter } from 'vue-router';
 import DisplayChannelCard from '../components/DisplayChannelCard.vue';
 import VideoCard from '../components/DisplayVideoCard.vue';
 export default {
-	    components: {
+	components: {
 		DisplayChannelCard,
 		VideoCard,
 	},

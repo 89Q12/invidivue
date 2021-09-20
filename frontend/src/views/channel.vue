@@ -2,9 +2,9 @@
 	<div class="channel">
 		<div v-if="results.channel">
             
-            <img class="banner" :src="results.channel.authorBanners[0].url">
+            <img class="col-sm-12 h-25"  :src="results.channel.authorBanners[1].url">
             
-            <img :src="results.channel.authorThumbnails[0].url">
+            <img class="col-sm-1" :src="results.channel.authorThumbnails[0].url">
             <SubscribeButton :cid="results.channel.authorId"/>
             <p>{{results.channel.author}}</p>
             <p>{{results.channel.authorId}}</p>
@@ -47,7 +47,5 @@ export default {
 };
 </script>
 <style lang="scss">
-.banner{
-width: -moz-available;
-}
+
 </style>
