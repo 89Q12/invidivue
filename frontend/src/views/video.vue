@@ -16,12 +16,13 @@
 		</div>
 		<div class="col-sm-10"></div>
 		<div class="col-sm-8">
-			<h4>{{ video.videoDetails.title }}</h4>
+			<h3>{{ video.videoDetails.title }}</h3>
 		</div>
 		<div class="col-sm-4">
 		</div>
 		<div class="col-sm-2">
-			<router-link :to="'/channel??id='+ video.videoDetails.channelId.id"> <p>{{ video.videoDetails.author.name }}| {{ video.videoDetails.author.subscriber_count / 1000 }}K</p></router-link>
+			<router-link :to="'/channel?id='+ video.videoDetails.channelId"> <p>{{ video.videoDetails.author.name }}| {{ video.videoDetails.author.subscriber_count / 1000 }}K</p></router-link>
+			<SubscribeButton :cid="video.videoDetails.channelId"/>
 			<p>Uploaded: {{ video.videoDetails.uploadDate }}</p>
 			<p>Views: {{ video.videoDetails.viewCount / 1000 }}K</p>
 			<p>Likes: {{ video.videoDetails.likes / 1000 }}K</p>
@@ -33,9 +34,8 @@
 		<div class="col-sm-2">
 			<div v-for="vid in video.related_videos" v-bind:key="vid" class="related">
 					<img :src="vid.thumbnails[0].url" :height="vid.thumbnails[0].height" :width="vid.thumbnails[0].width" />
-					{{ vid.length_seconds / 100 }} Min
-					>
-				<router-link :to="'/video?v='+ vid.id"><p>{{ vid.title }}</p></router-link>
+					{{ vid.length_seconds / 100 }} Min 
+				<router-link :to="'/watch?v='+ vid.id"><p>{{ vid.title }}</p></router-link>
 				<router-link :to="'/channel??id='+ vid.author.id"> <p>{{ vid.author.name }}</p></router-link>
 				<p>Uploaded: {{ vid.published }} views: {{ vid.view_count / 1000 }}K</p>
 			</div>
@@ -46,7 +46,11 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
+import SubscribeButton from '../components/SubscribeButton.vue';
 export default {
+	components: {
+		SubscribeButton,
+	},
 	setup() {
 		const store = useStore();
 		const router = useRouter();
@@ -56,8 +60,9 @@ export default {
 		if(router.currentRoute.value.query.v){
 			store.dispatch('get_current_video', router.currentRoute.value.query.v);
 		}
-
-		videosrc.value="";
+        onMounted(() =>{
+        document.title = video.value.videoDetails.title
+        })
 		
 		const changeformat= (e:any)=>{
 			video.value.formats.forEach((format:any) => {
