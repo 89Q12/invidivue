@@ -5,8 +5,7 @@
 </template>
 
 <script lang="ts">
-import axios, { AxiosError, AxiosResponse } from 'axios';
-import {ref, computed } from 'vue';
+import {computed } from 'vue';
 import { useStore } from 'vuex';
 export default {
     props: ['cid'],
@@ -27,7 +26,7 @@ export default {
         );
         const subscribe=()=>{
             if (buttontext.value === "Subscribe"){
-                store.dispatch('subscribe_to_channel',props.cid)
+                store.dispatch('subscribe',props.cid)
             }else{
                 store.dispatch('unsubscribe_to_channel', props.cid)
             }

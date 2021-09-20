@@ -7,8 +7,8 @@
     {{JSON.stringify(subscriptions[0].jsoncache, null, 2)}}
     </p>-->
     <div class="channellist" v-for="sub in subscriptions" v-bind:key="sub">
-        <div class="channelthumbnail">
-        <img :src="sub.jsoncache.authorThumbnails[0].url">
+        <div class="channelthumbnail ">
+        <img class="rounded-circle" :src="sub.jsoncache.authorThumbnails[0].url">
         <SubscribeButton :cid="sub.jsoncache.authorId" unsub/>
         </div>
         <router-link :to="'channel?id='+sub.jsoncache.authorId ">
@@ -27,15 +27,17 @@
 <script lang="ts">
 import SubscribeButton from '../components/SubscribeButton.vue';
 import axios, { AxiosError, AxiosResponse } from 'axios';
-import { reactive, ref, computed } from 'vue';
+import { ref, computed } from 'vue';
+import { useStore } from 'vuex';
 export default {
     components: {
 		SubscribeButton,
 	},
     setup() {
+        const store = useStore();
         //const { data:subscriptions } = await axios.get('http://localhost:5000/ay/subscriptions',{headers: {'Authorization': "Bearer "+localStorage.getItem('token')}});
         const subscriptions=ref();
-        axios.get('http://localhost:5000/ay/subscriptions',{headers: {'Authorization': "Bearer "+localStorage.getItem('token')}})
+        axios.get('http://localhost:5000/ay/subscriptions',{headers: {'Authorization': "Bearer "+ store.state.user_store_module.user.accessToken}})
         .then((res: AxiosResponse) => {
             console.log(res.data.subscriptions)
             const subs = res.data.subscriptions;

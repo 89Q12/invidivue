@@ -75,10 +75,10 @@ export const video_store_module = {
 				context.commit('set_error', err);
 			}
 		},
-		async subscribe_to_channel(context:any, channelID: string){
+		async subscribe_to_channel(context:any, { channelID, accessToken}: any){
 			try {
 				console.log("subscribe to "+channelID);
-				axios.get(url + '/subscribe?cid=' + channelID,{headers: {'Authorization': "Bearer "+context.user_store_module.user.accessToken}})
+				axios.get(url + '/subscribe?cid=' + channelID,{headers: {'Authorization': "Bearer "+ accessToken}})
 				.then((res: AxiosResponse) => {
 					console.log(res);
 					return res.data;
