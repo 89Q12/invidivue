@@ -4,7 +4,7 @@
         <img class="rounded-circle w-50" :src="props.video.thumbnails[0].url" />
     </div>
     <p><SubscribeButton :cid="props.video.id" /></p>
-        <router-link :to="'/channel??id='+ props.video.id" ><p>{{ props.video.name }}</p></router-link>
+        <router-link :to="'/channel?id='+ props.video.id" ><p>{{ props.video.name }}</p></router-link>
         <p>{{ props.video.videoCount }} videos</p>
         <p>{{ props.video.subscriberCount }}Subscribers</p> 
     </div>
