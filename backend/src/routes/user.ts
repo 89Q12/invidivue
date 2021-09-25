@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import controller from '../controllers/userController';
 import validation from '../middleware/validation';
-import * as passport from 'passport';
+import passport from 'passport';
 import { UserRegisterSchema, UserLoginSchema, UserChangeNameSchema, UserChangePasswordSchema } from '../interfaces/yupValidiationModels';
 const router = Router();
 // User routes go here

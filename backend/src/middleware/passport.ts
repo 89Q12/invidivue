@@ -1,4 +1,4 @@
-import * as JwtStrategy from 'passport-jwt';
+import JwtStrategy from 'passport-jwt';
 import {createConnection} from "typeorm";
 import {User} from '../entity/User';
 var connection = createConnection();

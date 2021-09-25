@@ -8,7 +8,7 @@ import signJWT from '../utils/signJTW';
 import * as RToken from '../models/refreshToken';
 import { createCanvas } from 'canvas';
 import db from '../utils/dbUtils';
-import e = require('express');
+
 // Register Funktion
 const register = async (req: Request, res: Response): Promise<Response> => {
 	const { username, password, captchatext, captchaid } = req.body;

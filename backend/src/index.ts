@@ -1,7 +1,7 @@
-import * as express from 'express';
-import * as cookieParser from 'cookie-parser';
-import * as cors from 'cors';
-import * as passport from 'passport';
+import express from 'express';
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
+import passport from 'passport';
 // midlleware imports
 import passportStrat from './middleware/passport';
 // utils imports

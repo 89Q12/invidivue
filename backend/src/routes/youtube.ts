@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import controller from '../controllers/youtubeController';
-import * as passport from 'passport';
+import passport from 'passport';
 const router = Router();
 // routes for get_video, get_channel etc go here
 router.get('/watch', controller.getVideoById)
