@@ -1,7 +1,6 @@
 import { Response } from "express";
 
 // Controller for youtuber routes like getVideoById, getChannelById
-import  { Client } from "../youtubeModule/youtubei/src";
 import ytch from 'yt-channel-info';
 import ytdl from 'ytdl-core';
 import { Channel } from "../entity/Channel";
@@ -9,7 +8,6 @@ import { User } from "../entity/User";
 import { Search } from "../entity/Search";
 import { Video } from "../entity/Video";
 import  db from '../utils/dbUtils';
-const youtube = new Client();
 
 // https://www.youtube.com/watch?v=dQw4w9WgXcQ //Just youtube url 
 const getVideoById = async (req, res): Promise<Response> => {
@@ -71,9 +69,7 @@ const getResults = async (req, res): Promise<Response> => {
         }
         
         if(reloadflag){
-            const videos = await youtube.search(query, {
-                type: "all", // video | playlist | channel | all
-            });
+            const videos = {};//TODO reimplement
             let dbsearch = new Search();
             dbsearch.query=query;
             dbsearch.cache=JSON.stringify(videos);
