@@ -1,9 +1,9 @@
 import { Response } from "express";
 
 // Controller for youtuber routes like getVideoById, getChannelById
-import  { Client } from "youtubei";
-import * as ytch from 'yt-channel-info';
-import * as ytdl from 'ytdl-core';
+import  { Client } from "../youtubeModule/youtubei/src";
+import ytch from 'yt-channel-info';
+import ytdl from 'ytdl-core';
 import { Channel } from "../entity/Channel";
 import { User } from "../entity/User";
 import { Search } from "../entity/Search";
@@ -11,8 +11,9 @@ import { Video } from "../entity/Video";
 import  db from '../utils/dbUtils';
 const youtube = new Client();
 
-//https://www.youtube.com/watch?v=dQw4w9WgXcQ //Just youtube url 
+// https://www.youtube.com/watch?v=dQw4w9WgXcQ //Just youtube url 
 const getVideoById = async (req, res): Promise<Response> => {
+    console.log(req.app)
     if(req.query["v"]){
         const vid= encodeURIComponent(req.query["v"]);
         const url = await ytdl.getInfo('http://www.youtube.com/watch?v='+vid);
@@ -505,5 +506,5 @@ export default {
     getSubscriptions,
     uploadnewpipesubs,
     getFeed,
-    updatefeeds
+    updatefeeds,
 };
