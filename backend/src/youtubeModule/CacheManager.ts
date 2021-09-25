@@ -20,6 +20,13 @@ export class Cache {
 	public async removeFromCache(target: EntityTarget<any>, id: Number): Promise<any> {
 		return await (await this.get_repo(target)).remove(id);
 	}
+    /**
+     * 
+     * @param target The entity class that should be used to check wether it is in the db or not
+     * @param filter Filter options e.g. video id
+     * @param options should be an object of typ FindOneOptions<any>
+     * @returns The db entry in question or returns false
+     */
 	public async isInCache(target: EntityTarget<any>, filter: any, options?: FindOneOptions<any>): Promise<any> {
 		const repo = await this.get_repo(target);
 		const answer = await repo.findOne(filter, options);
@@ -29,7 +36,7 @@ export class Cache {
 					return answer.cache;
 				} else {
 					this.removeFromCache(target, answer.id);
-					return;
+					return false;
 				}
 			}
 		}
