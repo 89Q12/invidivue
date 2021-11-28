@@ -1,0 +1,4 @@
+[submodule "backend/src/youtubei"]
+	path = backend/src/youtubei
+	url = git@github.com:11Tuvork28/youtubei.git
+	branch = main
