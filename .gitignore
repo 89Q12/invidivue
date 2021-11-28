@@ -52,5 +52,4 @@ Thumbs.db
 *.flv
 *.mov
 *.wmv
-*.sqlite
-package-lock.json
+backend/db.sqlite
